@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>ValueState - Dashboard</title>
+  <style>
+    body{font-family:Arial; margin:0; background:#f5f7fb;}
+    .navbar{background:#1e3a8a; color:#fff; padding:15px 30px; font-size:22px; font-weight:bold; display:flex; justify-content:space-between; align-items:center;}
+    .navlink{color:#fff; text-decoration:none; font-size:14px; padding:8px 12px; border:1px solid rgba(255,255,255,0.4); border-radius:6px;}
+    .wrap{width:90%; margin:20px auto;}
+    .stats{display:grid; grid-template-columns: repeat(4, 1fr); gap:15px; margin-bottom:20px;}
+    .box{background:#fff; padding:15px; border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,0.08);}
+    .big{font-size:22px; font-weight:bold; margin-top:6px;}
+    .charts{display:grid; grid-template-columns: 1fr; gap:18px;}
+    img{width:100%; border-radius:10px; background:#fff; box-shadow:0 2px 8px rgba(0,0,0,0.08);}
+    @media (max-width: 900px){ .stats{grid-template-columns: 1fr 1fr;} }
+    @media (max-width: 600px){ .stats{grid-template-columns: 1fr;} }
+  </style>
+</head>
+<body>
+
+<div class="navbar">
+  <div>📊 ValueState Dashboard</div>
+  <a class="navlink" href="/">⬅ Back to Listings</a>
+</div>
+
+<div class="wrap">
+
+  <div class="stats">
+    <div class="box"><div>Total Properties</div><div class="big">{{ total }}</div></div>
+    <div class="box"><div>🟢 Underpriced</div><div class="big">{{ under }}</div></div>
+    <div class="box"><div>⚖ Fairly Priced</div><div class="big">{{ fair }}</div></div>
+    <div class="box"><div>🔴 Overpriced</div><div class="big">{{ over }}</div></div>
+  </div>
+
+  <div class="charts">
+    <img src="/static/charts/loc_avg.png?v={{ ver }}" alt="Top locations avg price">
+    <img src="/static/charts/bhk_avg.png?v={{ ver }}" alt="BHK avg price">
+    <img src="/static/charts/rec_counts.png?v={{ ver }}" alt="Recommendation counts">
+  </div>
+
+</div>
+
+</body>
+</html>

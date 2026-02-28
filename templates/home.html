@@ -1,86 +1,205 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>ValueState - AI Price Recommendation</title>
+    <title>ValueState - Smart Real Estate Platform</title>
     <style>
         body {
             font-family: Arial;
-            background-color: #f4f6f9;
+            margin: 0;
+            background-color: #f5f7fb;
+        }
+
+        /* Navbar */
+        .navbar {
+            background-color: #1e3a8a;
+            color: white;
+            padding: 15px 30px;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        /* Search Box */
+        .search-box {
+            background: white;
+            margin: 20px auto;
+            padding: 20px;
+            width: 80%;
+            border-radius: 10px;
+            box-shadow: 0px 2px 8px rgba(0,0,0,0.1);
             text-align: center;
         }
 
-        .container {
-            background: white;
-            width: 50%;
-            margin: 40px auto;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
-        }
-
         input, select {
-            width: 80%;
             padding: 8px;
             margin: 8px;
+            width: 180px;
         }
 
         button {
             padding: 10px 20px;
-            background-color: #007BFF;
+            background-color: #2563eb;
             color: white;
             border: none;
             cursor: pointer;
+            border-radius: 5px;
         }
 
-        .result {
-            margin-top: 20px;
-            font-size: 18px;
+        /* Property Grid */
+        .property-section{
+  width: 92%;
+  margin: 0 auto 40px auto;
+}
+
+.property-container{
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+}
+@media (max-width: 1100px){
+  .property-container{ grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 700px){
+  .property-container{ grid-template-columns: 1fr; }
+}
+
+        /* Property Card */
+        .card {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0px 2px 8px rgba(0,0,0,0.1);
         }
 
-        .under { color: green; font-weight: bold; }
-        .over { color: red; font-weight: bold; }
-        .fair { color: orange; font-weight: bold; }
+        .price {
+            font-size: 20px;
+            font-weight: bold;
+            color: #1e40af;
+        }
+
+        .badge {
+            padding: 5px 10px;
+            border-radius: 5px;
+            color: white;
+            font-weight: bold;
+            display: inline-block;
+            margin-top: 10px;
+        }
+
+        .under { background-color: green; }
+        .over { background-color: red; }
+        .fair { background-color: orange; }
+
+        h2 {
+    margin-top: 30px;
+    color: #1e293b;
+    text-align: center;
+}
+
+.card:hover {
+    transform: scale(1.03);
+    transition: 0.3s ease;
+    box-shadow: 0px 8px 20px rgba(0,0,0,0.15);
+}
+
+.property-container{
+  border: 5px solid red !important;
+  background: yellow !important;
+  display: grid !important;
+  grid-template-columns: repeat(3, 1fr) !important;
+  gap: 20px !important;
+  width: 95% !important;
+  margin: 0 auto !important;
+}
+.card{
+  border: 3px solid blue !important;
+}
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h2>🏠 ValueState</h2>
-        <h4>AI Price Recommendation System</h4>
+<div class="navbar">
+    🏠 ValueState – AI Real Estate Platform
+</div>
 
-        <form method="POST">
+<div class="search-box">
+    <form method="POST">
+        <select name="location" required>
+            <option value="">Select Location</option>
+            {% for loc in locations %}
+            <option value="{{loc}}">{{loc}}</option>
+            {% endfor %}
+        </select>
 
-            <select name="location" required>
-                <option value="">Select Location</option>
-                {% for loc in locations %}
-                <option value="{{loc}}">{{loc}}</option>
-                {% endfor %}
-            </select>
+        <input type="number" name="sqft" placeholder="Sqft" required>
+        <input type="number" name="bath" placeholder="Bath" required>
+        <input type="number" name="bhk" placeholder="BHK" required>
+        <input type="number" name="listed_price" placeholder="Listed Price (Lakh)" required>
 
-            <input type="number" name="sqft" placeholder="Total Square Feet" required>
-            <input type="number" name="bath" placeholder="Number of Bathrooms" required>
-            <input type="number" name="bhk" placeholder="Number of BHK" required>
-            <input type="number" name="listed_price" placeholder="Listed Price (in Lakhs)" required>
+        <button type="submit">Analyze Property</button>
+    </form>
 
-            <br>
-            <button type="submit">Analyze Property</button>
-        </form>
+    {% if result %}
+        <h3>Predicted Fair Price: ₹ {{result}} Lakhs</h3>
+    {% endif %}
+</div>
+<form method="GET" style="margin-top:15px;">
+  <select name="location">
+    <option value="">All Locations</option>
+    {% for loc in locations %}
+      <option value="{{loc}}" {% if q_location==loc %}selected{% endif %}>{{loc}}</option>
+    {% endfor %}
+  </select>
 
-        {% if result %}
-        <div class="result">
-            <p><strong>Predicted Fair Price:</strong> ₹ {{result}} Lakhs</p>
+  <select name="bhk">
+    <option value="">Any BHK</option>
+    {% for b in [1,2,3,4,5] %}
+      <option value="{{b}}" {% if q_bhk==b|string %}selected{% endif %}>{{b}} BHK</option>
+    {% endfor %}
+  </select>
 
-            {% if recommendation == "Underpriced" %}
-                <p class="under">🟢 {{recommendation}}</p>
-            {% elif recommendation == "Overpriced" %}
-                <p class="over">🔴 {{recommendation}}</p>
-            {% else %}
-                <p class="fair">⚖ {{recommendation}}</p>
-            {% endif %}
-        </div>
-        {% endif %}
+  <input type="number" name="min_price" placeholder="Min Price" value="{{min_price}}">
+  <input type="number" name="max_price" placeholder="Max Price" value="{{max_price}}">
+  <input type="number" name="min_sqft" placeholder="Min Sqft" value="{{min_sqft}}">
+  <input type="number" name="max_sqft" placeholder="Max Sqft" value="{{max_sqft}}">
 
+  <select name="sort">
+    <option value="new" {% if sort_by=="new" %}selected{% endif %}>Newest</option>
+    <option value="price_asc" {% if sort_by=="price_asc" %}selected{% endif %}>Price: Low to High</option>
+    <option value="price_desc" {% if sort_by=="price_desc" %}selected{% endif %}>Price: High to Low</option>
+  </select>
+
+  <button type="submit">Search Listings</button>
+</form>
+
+<h2>Available Properties</h2>
+<p>Properties received: {{ properties|length }}</p>
+
+<div class="property-container">
+  {% for p in properties %}
+    <a href="/property/{{ p['id'] }}" style="text-decoration:none; color:inherit;">
+        <div class="card">
+      <img src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2"
+           style="width:100%; height:180px; object-fit:cover; border-radius:8px;">
+
+      <h3 style="margin-top:10px;">📍 {{ p["location"] }}</h3>
+
+      <p>{{ p["sqft"] }} sqft | 🛏 {{ p["bhk"] }} BHK | 🛁 {{ p["bath"] }} Bath</p>
+
+      <p class="price">₹ {{ p["listed_price"] }} Lakhs</p>
+
+      <p style="color:gray;">AI Predicted: ₹ {{ p["predicted_price"] }} Lakhs</p>
+
+      {% if p["recommendation"] == "Underpriced" %}
+        <div class="badge under">🟢 Underpriced Deal</div>
+      {% elif p["recommendation"] == "Overpriced" %}
+        <div class="badge over">🔴 Overpriced</div>
+      {% else %}
+        <div class="badge fair">⚖ Fair Price</div>
+      {% endif %}
     </div>
-
+    </a>
+  {% endfor %}
+</div>
 </body>
 </html>
