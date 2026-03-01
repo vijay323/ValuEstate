@@ -14,6 +14,30 @@
     .fair{background:orange;}
     input, textarea{width:100%; padding:10px; margin:8px 0; border-radius:6px; border:1px solid #ccc;}
     button{width:100%; padding:10px; background:#2563eb; color:#fff; border:0; border-radius:6px; cursor:pointer;}
+
+    .deal-badge{
+  font-size:12px;
+  font-weight:700;
+  letter-spacing:0.2px;
+  padding:6px 10px;
+  border-radius:999px;
+  display:inline-block;
+  border:1px solid rgba(0,0,0,0.08);
+}
+.deal-excellent{ background:#e7f7ee; color:#0f5132; }
+.deal-good{ background:#e8f0fe; color:#1e3a8a; }
+.deal-fair{ background:#fff4e5; color:#7a4a00; }
+.deal-overpriced{ background:#fdecea; color:#8a1f17; }
+.score{
+  font-size:12px;
+  color:#0f172a;
+  background:#f1f5f9;
+  border:1px solid rgba(0,0,0,0.08);
+  padding:6px 10px;
+  border-radius:999px;
+  font-weight:700;
+  margin-left:10px;
+}
   </style>
 </head>
 <body>
@@ -22,9 +46,13 @@
 
 <div class="wrap">
   <div class="box">
-    <img src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2"
-         style="width:100%; height:320px; object-fit:cover; border-radius:10px;">
-
+    {% if p.image %}
+<img src="/static/uploads/{{ p.image }}" 
+     style="width:100%; height:320px; object-fit:cover; border-radius:10px;">
+{% else %}
+<img src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2"
+     style="width:100%; height:320px; object-fit:cover; border-radius:10px;">
+{% endif %}
     <h2 style="margin-top:15px;">📍 {{ p.location }}</h2>
     <p>{{ p.sqft }} sqft | 🛏 {{ p.bhk }} BHK | 🛁 {{ p.bath }} Bath</p>
 
@@ -38,7 +66,12 @@
     {% else %}
       <div class="badge fair">⚖ Fair Price</div>
     {% endif %}
+    <div style="margin:10px 0;">
+  <span class="deal-badge {{ p.deal_class }}">{{ p.deal_rating }}</span>
+  <span class="score">Score {{ p.investment_score }}/100</span>
+</div>
 
+<p style="color:gray;">AI fair value: ₹ {{ p.predicted_price }} Lakhs</p>
     <hr style="margin:20px 0;">
     <h3>About this property</h3>
     <p>
@@ -49,12 +82,17 @@
 
   <div class="box">
     <h3>Contact / Inquiry</h3>
-    <form method="POST" action="#">
-      <input type="text" placeholder="Your Name" required>
-      <input type="tel" placeholder="Phone Number" required>
-      <textarea rows="4" placeholder="Message (I am interested in this property)" required></textarea>
-      <button type="submit">Send Inquiry</button>
-    </form>
+
+{% if success %}
+  <p style="color:green; font-weight:bold;">{{ success }}</p>
+{% endif %}
+
+<form method="POST">
+  <input type="text" name="name" placeholder="Your Name" required>
+  <input type="tel" name="phone" placeholder="Phone Number" required>
+  <textarea name="message" rows="4" placeholder="I'm interested in this property" required></textarea>
+  <button type="submit">Send Inquiry</button>
+</form>
 
     <p style="font-size:12px; color:gray; margin-top:10px;">
       (For major project demo, inquiry can be stored in database later.)

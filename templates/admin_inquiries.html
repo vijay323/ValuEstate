@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin - Inquiries</title>
+  <style>
+    body{font-family:Arial; margin:0; background:#f5f7fb;}
+    .navbar{background:#1e3a8a; color:#fff; padding:15px 30px; font-size:20px; font-weight:700; display:flex; justify-content:space-between; align-items:center;}
+    .navlink{color:#fff; text-decoration:none; font-size:14px; padding:8px 12px; border:1px solid rgba(255,255,255,0.35); border-radius:8px; margin-left:10px;}
+    .wrap{width:92%; margin:20px auto;}
+    .card{background:#fff; padding:14px; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.08); margin-bottom:12px;}
+    .row{display:flex; flex-wrap:wrap; gap:10px; color:#0f172a;}
+    .pill{font-size:12px; background:#f1f5f9; border:1px solid rgba(0,0,0,0.08); padding:6px 10px; border-radius:999px; font-weight:700;}
+    .muted{color:#64748b; font-size:13px;}
+    .msg{margin-top:10px; color:#0f172a; line-height:1.4;}
+    .empty{background:#fff; padding:18px; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.08); text-align:center; color:#64748b;}
+  </style>
+</head>
+<body>
+
+<div class="navbar">
+  <div>Admin: Inquiries</div>
+  <div>
+    <a class="navlink" href="/">Listings</a>
+    <a class="navlink" href="/dashboard">Dashboard</a>
+  </div>
+</div>
+
+<div class="wrap">
+  {% if inquiries|length == 0 %}
+    <div class="empty">No inquiries yet.</div>
+  {% else %}
+    {% for i in inquiries %}
+      <div class="card">
+        <div class="row">
+          <span class="pill">Inquiry #{{ i.inquiry_id }}</span>
+          <span class="pill">Property ID {{ i.property_id }}</span>
+          <span class="pill">{{ i.location }}</span>
+          <span class="pill">{{ i.bhk }} BHK</span>
+          <span class="pill">{{ i.sqft }} sqft</span>
+          <span class="pill">₹ {{ i.listed_price }} Lakhs</span>
+        </div>
+
+        <div class="muted" style="margin-top:8px;">
+          Name: <b>{{ i.name }}</b> &nbsp;|&nbsp; Phone: <b>{{ i.phone }}</b>
+        </div>
+
+        <div class="msg"><b>Message:</b> {{ i.message }}</div>
+
+        <div style="margin-top:10px;">
+          <a href="/property/{{ i.property_id }}" style="text-decoration:none; color:#1e3a8a; font-weight:700;">Open Property</a>
+        </div>
+      </div>
+    {% endfor %}
+  {% endif %}
+</div>
+
+</body>
+</html>

@@ -1,205 +1,582 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>ValueState - Smart Real Estate Platform</title>
-    <style>
-        body {
-            font-family: Arial;
-            margin: 0;
-            background-color: #f5f7fb;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>ValueState - Smart Real Estate Platform</title>
 
-        /* Navbar */
-        .navbar {
-            background-color: #1e3a8a;
-            color: white;
-            padding: 15px 30px;
-            font-size: 24px;
-            font-weight: bold;
-        }
+  <style>
+    :root{
+      --bg:#f5f7fb;
+      --card:#ffffff;
+      --text:#0f172a;
+      --muted:#64748b;
+      --nav:#1e3a8a;
+      --primary:#2563eb;
+      --border:rgba(15,23,42,0.10);
+      --shadow:0 10px 30px rgba(2,6,23,0.08);
+      --shadow2:0 6px 18px rgba(2,6,23,0.08);
+      --radius:14px;
+    }
 
-        /* Search Box */
-        .search-box {
-            background: white;
-            margin: 20px auto;
-            padding: 20px;
-            width: 80%;
-            border-radius: 10px;
-            box-shadow: 0px 2px 8px rgba(0,0,0,0.1);
-            text-align: center;
-        }
+    *{box-sizing:border-box}
+    body{
+      font-family: Arial, sans-serif;
+      margin:0;
+      background:var(--bg);
+      color:var(--text);
+    }
 
-        input, select {
-            padding: 8px;
-            margin: 8px;
-            width: 180px;
-        }
+    a{color:inherit; text-decoration:none}
 
-        button {
-            padding: 10px 20px;
-            background-color: #2563eb;
-            color: white;
-            border: none;
-            cursor: pointer;
-            border-radius: 5px;
-        }
+    .navbar{
+      background:var(--nav);
+      color:#fff;
+      padding:14px 22px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:16px;
+      position:sticky;
+      top:0;
+      z-index:10;
+      box-shadow:0 6px 18px rgba(2,6,23,0.18);
+    }
+    .brand{
+      font-size:20px;
+      font-weight:800;
+      letter-spacing:0.2px;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      white-space:nowrap;
+    }
+    .brand-badge{
+      width:34px; height:34px;
+      border-radius:10px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      background:rgba(255,255,255,0.12);
+      border:1px solid rgba(255,255,255,0.18);
+      font-weight:900;
+    }
 
-        /* Property Grid */
-        .property-section{
-  width: 92%;
-  margin: 0 auto 40px auto;
-}
+    .navlinks{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+    .navlink{
+      font-size:13px;
+      padding:8px 12px;
+      border-radius:10px;
+      border:1px solid rgba(255,255,255,0.25);
+      background:rgba(255,255,255,0.08);
+    }
+    .navlink:hover{background:rgba(255,255,255,0.14)}
 
-.property-container{
-  width: 100%;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 22px;
-}
-@media (max-width: 1100px){
-  .property-container{ grid-template-columns: repeat(2, 1fr); }
-}
-@media (max-width: 700px){
-  .property-container{ grid-template-columns: 1fr; }
-}
+    .wrap{
+      width:min(1180px, 92%);
+      margin:18px auto 44px auto;
+    }
 
-        /* Property Card */
-        .card {
-            background: white;
-            padding: 15px;
-            border-radius: 10px;
-            box-shadow: 0px 2px 8px rgba(0,0,0,0.1);
-        }
+    .hero{
+      display:grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap:18px;
+      align-items:start;
+      margin-top:10px;
+    }
+    @media (max-width: 960px){
+      .hero{grid-template-columns:1fr}
+    }
 
-        .price {
-            font-size: 20px;
-            font-weight: bold;
-            color: #1e40af;
-        }
+    .panel{
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+    .panel-head{
+      padding:16px 16px 12px 16px;
+      border-bottom:1px solid var(--border);
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+    }
+    .panel-title{
+      font-size:16px;
+      font-weight:800;
+    }
+    .panel-sub{
+      font-size:12px;
+      color:var(--muted);
+      margin-top:4px;
+    }
+    .panel-body{
+      padding:14px 16px 16px 16px;
+    }
 
-        .badge {
-            padding: 5px 10px;
-            border-radius: 5px;
-            color: white;
-            font-weight: bold;
-            display: inline-block;
-            margin-top: 10px;
-        }
+    .grid-form{
+      display:grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap:10px;
+      align-items:end;
+    }
+    @media (max-width: 960px){
+      .grid-form{grid-template-columns: repeat(2, 1fr);}
+    }
+    @media (max-width: 560px){
+      .grid-form{grid-template-columns: 1fr;}
+    }
 
-        .under { background-color: green; }
-        .over { background-color: red; }
-        .fair { background-color: orange; }
+    label{
+      font-size:12px;
+      color:var(--muted);
+      display:block;
+      margin-bottom:6px;
+      font-weight:700;
+    }
+    input, select{
+      width:100%;
+      padding:10px 11px;
+      border-radius:12px;
+      border:1px solid rgba(15,23,42,0.14);
+      background:#fff;
+      outline:none;
+      font-size:14px;
+    }
+    input:focus, select:focus{
+      border-color:rgba(37,99,235,0.55);
+      box-shadow:0 0 0 4px rgba(37,99,235,0.12);
+    }
 
-        h2 {
-    margin-top: 30px;
-    color: #1e293b;
-    text-align: center;
-}
+    .btn{
+      padding:11px 14px;
+      border-radius:12px;
+      border:0;
+      cursor:pointer;
+      font-weight:800;
+      font-size:14px;
+      background:var(--primary);
+      color:#fff;
+      width:100%;
+    }
+    .btn:hover{filter:brightness(0.95)}
+    .btn-ghost{
+      background:#fff;
+      color:var(--text);
+      border:1px solid rgba(15,23,42,0.14);
+    }
 
-.card:hover {
-    transform: scale(1.03);
-    transition: 0.3s ease;
-    box-shadow: 0px 8px 20px rgba(0,0,0,0.15);
-}
+    .result-box{
+      margin-top:12px;
+      padding:12px 12px;
+      border-radius:14px;
+      border:1px solid rgba(15,23,42,0.10);
+      background:linear-gradient(180deg, rgba(37,99,235,0.08), rgba(37,99,235,0.03));
+    }
+    .result-row{
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      align-items:center;
+      flex-wrap:wrap;
+    }
+    .result-big{
+      font-size:18px;
+      font-weight:900;
+      letter-spacing:0.2px;
+    }
+    .pill{
+      font-size:12px;
+      font-weight:900;
+      padding:7px 10px;
+      border-radius:999px;
+      border:1px solid rgba(15,23,42,0.10);
+      background:#fff;
+      color:var(--text);
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+    }
+    .pill-under{ background:#e7f7ee; color:#0f5132; }
+    .pill-fair{ background:#fff4e5; color:#7a4a00; }
+    .pill-over{ background:#fdecea; color:#8a1f17; }
 
-.property-container{
-  border: 5px solid red !important;
-  background: yellow !important;
-  display: grid !important;
-  grid-template-columns: repeat(3, 1fr) !important;
-  gap: 20px !important;
-  width: 95% !important;
-  margin: 0 auto !important;
-}
-.card{
-  border: 3px solid blue !important;
-}
-    </style>
+    .filters{
+      display:grid;
+      grid-template-columns: 1.2fr 1fr 0.8fr 0.8fr 1fr 0.8fr;
+      gap:10px;
+      align-items:end;
+    }
+    @media (max-width: 960px){
+      .filters{grid-template-columns: repeat(2, 1fr);}
+    }
+    @media (max-width: 560px){
+      .filters{grid-template-columns: 1fr;}
+    }
+
+    .section-title{
+      margin:22px 0 10px 0;
+      font-size:16px;
+      font-weight:900;
+      letter-spacing:0.2px;
+    }
+    .section-meta{
+      color:var(--muted);
+      font-size:13px;
+      margin-bottom:14px;
+    }
+
+    .property-container{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap:18px;
+    }
+    @media (max-width: 1100px){
+      .property-container{ grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 700px){
+      .property-container{ grid-template-columns: 1fr; }
+    }
+
+    .card{
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:16px;
+      overflow:hidden;
+      box-shadow:var(--shadow2);
+      transition:transform .18s ease, box-shadow .18s ease;
+    }
+    .card:hover{
+      transform:translateY(-3px);
+      box-shadow:0 14px 34px rgba(2,6,23,0.12);
+    }
+    .card-img{
+      width:100%;
+      height:180px;
+      object-fit:cover;
+      display:block;
+      background:#e2e8f0;
+    }
+    .card-body{
+      padding:12px 12px 14px 12px;
+    }
+    .card-top{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:10px;
+    }
+    .loc{
+      font-weight:900;
+      font-size:15px;
+      margin:0 0 4px 0;
+      line-height:1.2;
+    }
+    .meta{
+      color:var(--muted);
+      font-size:13px;
+      margin:4px 0 8px 0;
+    }
+    .price{
+      font-size:18px;
+      font-weight:900;
+      color:#1e40af;
+      margin:6px 0 4px 0;
+    }
+    .small{
+      color:var(--muted);
+      font-size:12.5px;
+      margin:0;
+    }
+
+    .badge{
+      font-size:12px;
+      font-weight:900;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid rgba(15,23,42,0.10);
+      white-space:nowrap;
+      display:inline-block;
+      background:#fff;
+    }
+    .under{ background:#e7f7ee; color:#0f5132; }
+    .over{ background:#fdecea; color:#8a1f17; }
+    .fair{ background:#fff4e5; color:#7a4a00; }
+
+    .deal-row{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      margin-top:10px;
+    }
+    .deal-badge{
+      font-size:12px;
+      font-weight:900;
+      letter-spacing:0.2px;
+      padding:6px 10px;
+      border-radius:999px;
+      display:inline-block;
+      border:1px solid rgba(15,23,42,0.10);
+      background:#fff;
+    }
+    .deal-excellent{ background:#e7f7ee; color:#0f5132; }
+    .deal-good{ background:#e8f0fe; color:#1e3a8a; }
+    .deal-fair{ background:#fff4e5; color:#7a4a00; }
+    .deal-overpriced{ background:#fdecea; color:#8a1f17; }
+
+    .score{
+      font-size:12px;
+      color:#0f172a;
+      background:#f1f5f9;
+      border:1px solid rgba(15,23,42,0.10);
+      padding:6px 10px;
+      border-radius:999px;
+      font-weight:900;
+      white-space:nowrap;
+    }
+
+    .pagination{
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      gap:10px;
+      margin:22px 0 0 0;
+      flex-wrap:wrap;
+    }
+    .pagebtn{
+      padding:9px 12px;
+      border-radius:12px;
+      border:1px solid rgba(15,23,42,0.14);
+      background:#fff;
+      font-weight:900;
+      font-size:13px;
+    }
+    .pagebtn:hover{background:#f8fafc}
+    .pagenum{
+      color:var(--muted);
+      font-weight:800;
+      font-size:13px;
+      padding:8px 10px;
+    }
+  </style>
 </head>
+
 <body>
+  <div class="navbar">
+    <div class="brand">
+      <span class="brand-badge">VS</span>
+      <span>ValueState</span>
+    </div>
+    <div class="navlinks">
+      <a class="navlink" href="/dashboard">Dashboard</a>
+      <a class="navlink" href="/analytics">Analytics</a>
+      <a class="navlink" href="/add">Post Property</a>
+    </div>
+  </div>
 
-<div class="navbar">
-    🏠 ValueState – AI Real Estate Platform
-</div>
+  <div class="wrap">
 
-<div class="search-box">
-    <form method="POST">
-        <select name="location" required>
-            <option value="">Select Location</option>
-            {% for loc in locations %}
-            <option value="{{loc}}">{{loc}}</option>
-            {% endfor %}
-        </select>
+    <div class="hero">
 
-        <input type="number" name="sqft" placeholder="Sqft" required>
-        <input type="number" name="bath" placeholder="Bath" required>
-        <input type="number" name="bhk" placeholder="BHK" required>
-        <input type="number" name="listed_price" placeholder="Listed Price (Lakh)" required>
+      <div class="panel">
+        <div class="panel-head">
+          <div>
+            <div class="panel-title">AI Price Analyzer</div>
+            <div class="panel-sub">Enter details to estimate fair value using your ML model</div>
+          </div>
+        </div>
+        <div class="panel-body">
+          <form method="POST">
+            <div class="grid-form">
+              <div>
+                <label>Location</label>
+                <select name="location" required>
+                  <option value="">Select Location</option>
+                  {% for loc in locations %}
+                    <option value="{{ loc }}">{{ loc }}</option>
+                  {% endfor %}
+                </select>
+              </div>
 
-        <button type="submit">Analyze Property</button>
-    </form>
+              <div>
+                <label>Sqft</label>
+                <input type="number" name="sqft" placeholder="Total sqft" required>
+              </div>
 
-    {% if result %}
-        <h3>Predicted Fair Price: ₹ {{result}} Lakhs</h3>
-    {% endif %}
-</div>
-<form method="GET" style="margin-top:15px;">
-  <select name="location">
-    <option value="">All Locations</option>
-    {% for loc in locations %}
-      <option value="{{loc}}" {% if q_location==loc %}selected{% endif %}>{{loc}}</option>
-    {% endfor %}
-  </select>
+              <div>
+                <label>Bath</label>
+                <input type="number" name="bath" placeholder="Bathrooms" required>
+              </div>
 
-  <select name="bhk">
-    <option value="">Any BHK</option>
-    {% for b in [1,2,3,4,5] %}
-      <option value="{{b}}" {% if q_bhk==b|string %}selected{% endif %}>{{b}} BHK</option>
-    {% endfor %}
-  </select>
+              <div>
+                <label>BHK</label>
+                <input type="number" name="bhk" placeholder="BHK" required>
+              </div>
 
-  <input type="number" name="min_price" placeholder="Min Price" value="{{min_price}}">
-  <input type="number" name="max_price" placeholder="Max Price" value="{{max_price}}">
-  <input type="number" name="min_sqft" placeholder="Min Sqft" value="{{min_sqft}}">
-  <input type="number" name="max_sqft" placeholder="Max Sqft" value="{{max_sqft}}">
+              <div>
+                <label>Listed Price (Lakhs)</label>
+                <input type="number" name="listed_price" placeholder="Price" required>
+              </div>
 
-  <select name="sort">
-    <option value="new" {% if sort_by=="new" %}selected{% endif %}>Newest</option>
-    <option value="price_asc" {% if sort_by=="price_asc" %}selected{% endif %}>Price: Low to High</option>
-    <option value="price_desc" {% if sort_by=="price_desc" %}selected{% endif %}>Price: High to Low</option>
-  </select>
+              <div style="grid-column:1 / -1; display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                <button class="btn" type="submit">Analyze</button>
+                <a class="btn btn-ghost" href="/" style="display:inline-flex; align-items:center; justify-content:center;">Reset</a>
+              </div>
+            </div>
+          </form>
 
-  <button type="submit">Search Listings</button>
-</form>
+          {% if result %}
+            <div class="result-box">
+              <div class="result-row">
+                <div class="result-big">Predicted Fair Price: ₹ {{ result }} Lakhs</div>
 
-<h2>Available Properties</h2>
-<p>Properties received: {{ properties|length }}</p>
+                {% if recommendation == "Underpriced" %}
+                  <span class="pill pill-under">Underpriced</span>
+                {% elif recommendation == "Overpriced" %}
+                  <span class="pill pill-over">Overpriced</span>
+                {% else %}
+                  <span class="pill pill-fair">Fairly Priced</span>
+                {% endif %}
+              </div>
+              <div class="meta" style="margin-top:8px;">
+                Tip: Fairly priced means within your ±10% band compared to predicted value.
+              </div>
+            </div>
+          {% endif %}
+        </div>
+      </div>
 
-<div class="property-container">
-  {% for p in properties %}
-    <a href="/property/{{ p['id'] }}" style="text-decoration:none; color:inherit;">
-        <div class="card">
-      <img src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2"
-           style="width:100%; height:180px; object-fit:cover; border-radius:8px;">
+      <div class="panel">
+        <div class="panel-head">
+          <div>
+            <div class="panel-title">Search Listings</div>
+            <div class="panel-sub">Filter properties by location, BHK, price and sorting</div>
+          </div>
+        </div>
+        <div class="panel-body">
+          <form method="GET">
+            <div class="filters">
 
-      <h3 style="margin-top:10px;">📍 {{ p["location"] }}</h3>
+              <div>
+                <label>Search</label>
+                <input type="text" name="q" placeholder="Search location..." value="{{ q }}">
+              </div>
 
-      <p>{{ p["sqft"] }} sqft | 🛏 {{ p["bhk"] }} BHK | 🛁 {{ p["bath"] }} Bath</p>
+              <div>
+                <label>Location</label>
+                <select name="location">
+                  <option value="">All Locations</option>
+                  {% for loc in locations %}
+                    <option value="{{ loc }}" {% if q_location==loc %}selected{% endif %}>{{ loc }}</option>
+                  {% endfor %}
+                </select>
+              </div>
 
-      <p class="price">₹ {{ p["listed_price"] }} Lakhs</p>
+              <div>
+                <label>BHK</label>
+                <select name="bhk">
+                  <option value="">Any</option>
+                  {% for b in [1,2,3,4,5] %}
+                    <option value="{{ b }}" {% if q_bhk==b|string %}selected{% endif %}>{{ b }} BHK</option>
+                  {% endfor %}
+                </select>
+              </div>
 
-      <p style="color:gray;">AI Predicted: ₹ {{ p["predicted_price"] }} Lakhs</p>
+              <div>
+                <label>Min Price</label>
+                <input type="number" name="min_price" placeholder="Min" value="{{ min_price }}">
+              </div>
 
-      {% if p["recommendation"] == "Underpriced" %}
-        <div class="badge under">🟢 Underpriced Deal</div>
-      {% elif p["recommendation"] == "Overpriced" %}
-        <div class="badge over">🔴 Overpriced</div>
-      {% else %}
-        <div class="badge fair">⚖ Fair Price</div>
+              <div>
+                <label>Max Price</label>
+                <input type="number" name="max_price" placeholder="Max" value="{{ max_price }}">
+              </div>
+
+              <div>
+                <label>Sort</label>
+                <select name="sort">
+                  <option value="new" {% if sort_by=="new" %}selected{% endif %}>Newest</option>
+                  <option value="price_asc" {% if sort_by=="price_asc" %}selected{% endif %}>Price: Low to High</option>
+                  <option value="price_desc" {% if sort_by=="price_desc" %}selected{% endif %}>Price: High to Low</option>
+                </select>
+              </div>
+
+              <div style="grid-column:1 / -1; display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                <button class="btn" type="submit">Apply Filters</button>
+                <a class="btn btn-ghost" href="/" style="display:inline-flex; align-items:center; justify-content:center;">Clear</a>
+              </div>
+
+            </div>
+          </form>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="section-title">Available Properties</div>
+    <div class="section-meta">
+      Showing {{ properties|length }} properties on this page
+    </div>
+
+    <div class="property-container">
+      {% for p in properties %}
+        <a href="/property/{{ p['id'] }}">
+          <div class="card">
+            {% if p["image"] %}
+              <img class="card-img" src="/static/uploads/{{ p['image'] }}" alt="Property Image">
+            {% else %}
+              <img class="card-img" src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2" alt="Property Image">
+            {% endif %}
+
+            <div class="card-body">
+              <div class="card-top">
+                <div>
+                  <div class="loc">{{ p["location"] }}</div>
+                  <div class="meta">{{ p["sqft"] }} sqft • {{ p["bhk"] }} BHK • {{ p["bath"] }} Bath</div>
+                </div>
+
+                {% if p["recommendation"] == "Underpriced" %}
+                  <span class="badge under">Underpriced</span>
+                {% elif p["recommendation"] == "Overpriced" %}
+                  <span class="badge over">Overpriced</span>
+                {% else %}
+                  <span class="badge fair">Fair</span>
+                {% endif %}
+              </div>
+
+              <div class="price">₹ {{ p["listed_price"] }} Lakhs</div>
+              <p class="small">AI Predicted: ₹ {{ p["predicted_price"] }} Lakhs</p>
+
+              <div class="deal-row">
+                <span class="deal-badge {{ p['deal_class'] }}">{{ p["deal_rating"] }}</span>
+                <span class="score">Score {{ p["investment_score"] }}/100</span>
+              </div>
+            </div>
+          </div>
+        </a>
+      {% endfor %}
+    </div>
+
+    <div class="pagination">
+      {% if page > 1 %}
+        <a class="pagebtn" href="?q={{q}}&location={{q_location}}&bhk={{q_bhk}}&min_price={{min_price}}&max_price={{max_price}}&sort={{sort_by}}&page={{ page-1 }}">Prev</a>
+      {% endif %}
+
+      <span class="pagenum">Page {{ page }} / {{ total_pages }}</span>
+
+      {% if page < total_pages %}
+        <a class="pagebtn" href="?q={{q}}&location={{q_location}}&bhk={{q_bhk}}&min_price={{min_price}}&max_price={{max_price}}&sort={{sort_by}}&page={{ page+1 }}">Next</a>
       {% endif %}
     </div>
-    </a>
-  {% endfor %}
-</div>
+
+  </div>
 </body>
 </html>

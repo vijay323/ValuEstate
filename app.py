@@ -1,13 +1,18 @@
 from flask import Flask, render_template, request
+from flask import session
 import joblib
 import pandas as pd
 import sqlite3
+from werkzeug.utils import secure_filename
 import os
 import matplotlib.pyplot as plt
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(BASE_DIR, "database.db")
 
 app = Flask(__name__)
+UPLOAD_FOLDER = os.path.join(BASE_DIR, "static", "uploads")
+app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 # Load model
 model = joblib.load("model/pune_house_price_model.pkl")
@@ -38,6 +43,41 @@ def price_recommendation(listed_price, predicted_price):
     else:
         return "Fairly Priced"
 
+def investment_score(listed_price, predicted_price):
+    listed_price = float(listed_price)
+    predicted_price = float(predicted_price)
+    if predicted_price <= 0:
+        return 50
+    diff_ratio = (predicted_price - listed_price) / predicted_price  # +ve means underpriced
+    score = 50 + (diff_ratio * 200)  # 10% underpriced => +20
+    if score < 0:
+        score = 0
+    if score > 100:
+        score = 100
+    return int(round(score))
+
+def deal_rating(listed_price, predicted_price):
+    listed_price = float(listed_price)
+    predicted_price = float(predicted_price)
+    if predicted_price <= 0:
+        return "Fair"
+    ratio = listed_price / predicted_price
+    if ratio <= 0.90:
+        return "Excellent"
+    if ratio <= 0.97:
+        return "Good"
+    if ratio <= 1.10:
+        return "Fair"
+    return "Overpriced"
+
+def deal_class(rating):
+    return {
+        "Excellent": "deal-excellent",
+        "Good": "deal-good",
+        "Fair": "deal-fair",
+        "Overpriced": "deal-overpriced"
+    }.get(rating, "deal-fair")
+
 @app.route("/", methods=["GET", "POST"])
 def home():
     result = None
@@ -54,20 +94,26 @@ def home():
         result = round(predicted_price, 2)
         recommendation = price_recommendation(listed_price, predicted_price)
 
-    # Connect DB
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
 
-    # ---- Filters (GET params) ----
+    q = request.args.get("q", "").strip()
     q_location = request.args.get("location", "").strip()
     q_bhk = request.args.get("bhk", "").strip()
     min_price = request.args.get("min_price", "").strip()
     max_price = request.args.get("max_price", "").strip()
     sort_by = request.args.get("sort", "new")
+    page = int(request.args.get("page", 1))
+    per_page = 9
+    offset = (page - 1) * per_page
 
     sql = "SELECT * FROM properties WHERE 1=1"
     params = []
+
+    if q:
+        sql += " AND location LIKE ?"
+        params.append(f"%{q}%")
 
     if q_location:
         sql += " AND location = ?"
@@ -85,6 +131,11 @@ def home():
         sql += " AND listed_price <= ?"
         params.append(float(max_price))
 
+    count_sql = "SELECT COUNT(*) FROM (" + sql + ")"
+    cursor.execute(count_sql, params)
+    total = cursor.fetchone()[0]
+    total_pages = max(1, (total + per_page - 1) // per_page)
+
     if sort_by == "price_asc":
         sql += " ORDER BY listed_price ASC"
     elif sort_by == "price_desc":
@@ -92,30 +143,39 @@ def home():
     else:
         sql += " ORDER BY id DESC"
 
-    cursor.execute(sql, params)
-    db_properties = cursor.fetchall()
-    conn.close()
+    sql += " LIMIT ? OFFSET ?"
+    params2 = params + [per_page, offset]
 
-    # AI Analysis for each property
+    cursor.execute(sql, params2)
+    db_properties = cursor.fetchall()
+
     analyzed_properties = []
     for p in db_properties:
         predicted_price = predict_price(p["location"], p["sqft"], p["bath"], p["bhk"])
         rec = price_recommendation(p["listed_price"], predicted_price)
+        rating = deal_rating(p["listed_price"], predicted_price)
+        score = investment_score(p["listed_price"], predicted_price)
+        dclass = deal_class(rating)
 
         analyzed_properties.append({
-    "id": p["id"],   # ⭐ ADD THIS LINE
-    "location": p["location"],
-    "sqft": p["sqft"],
-    "bath": p["bath"],
-    "bhk": p["bhk"],
-    "listed_price": p["listed_price"],
-    "predicted_price": round(predicted_price, 2),
-    "recommendation": rec
-})
-            
-        
+            "id": p["id"],
+            "location": p["location"],
+            "sqft": p["sqft"],
+            "bath": p["bath"],
+            "bhk": p["bhk"],
+            "listed_price": p["listed_price"],
+            "image": p["image"],
+            "predicted_price": round(predicted_price, 2),
+            "recommendation": rec,
+            "deal_rating": rating,
+            "deal_class": dclass,
+            "investment_score": score
+        })
 
-    locations = sorted(set([p["location"] for p in db_properties]))
+    cursor.execute("SELECT DISTINCT location FROM properties ORDER BY location")
+    locations = [r["location"] for r in cursor.fetchall()]
+
+    conn.close()
 
     return render_template(
         "home.html",
@@ -123,41 +183,72 @@ def home():
         recommendation=recommendation,
         properties=analyzed_properties,
         locations=locations,
+        q=q,
         q_location=q_location,
         q_bhk=q_bhk,
         min_price=min_price,
         max_price=max_price,
-        sort_by=sort_by
+        sort_by=sort_by,
+        page=page,
+        total_pages=total_pages
     )
 
-@app.route("/property/<int:pid>")
-def property_detail(pid):
+
+
+@app.route("/property/<int:pid>", methods=["GET", "POST"])
+def property(pid):
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     cur = conn.cursor()
 
     cur.execute("SELECT * FROM properties WHERE id = ?", (pid,))
     p = cur.fetchone()
-    conn.close()
 
     if p is None:
+        conn.close()
         return "Property not found", 404
+
+    success = None
+
+    if request.method == "POST":
+        name = request.form["name"]
+        phone = request.form["phone"]
+        message = request.form["message"]
+
+        cur.execute("""
+            INSERT INTO inquiries (property_id, name, phone, message)
+            VALUES (?, ?, ?, ?)
+        """, (pid, name, phone, message))
+        conn.commit()
+        success = "Inquiry sent successfully!"
+
+    conn.close()
 
     predicted_price = predict_price(p["location"], p["sqft"], p["bath"], p["bhk"])
     rec = price_recommendation(p["listed_price"], predicted_price)
 
-    property_data = {
-        "id": p["id"],
-        "location": p["location"],
-        "sqft": p["sqft"],
-        "bath": p["bath"],
-        "bhk": p["bhk"],
-        "listed_price": p["listed_price"],
-        "predicted_price": round(predicted_price, 2),
-        "recommendation": rec
-    }
+    rating = deal_rating(p["listed_price"], predicted_price)
+    score = investment_score(p["listed_price"], predicted_price)
+    dclass = deal_class(rating)
 
-    return render_template("property.html", p=property_data)
+    property_data = {
+    "id": p["id"],
+    "location": p["location"],
+    "sqft": p["sqft"],
+    "bath": p["bath"],
+    "bhk": p["bhk"],
+    "listed_price": p["listed_price"],
+    "image": p["image"],
+    "predicted_price": round(predicted_price, 2),
+    "recommendation": rec,
+    "deal_rating": rating,
+    "deal_class": dclass,
+    "investment_score": score
+}
+
+    return render_template("property.html", p=property_data, success=success)
+
+    
 
 @app.route("/dashboard")
 def dashboard():
@@ -236,6 +327,143 @@ def dashboard():
         over=int(rec_counts.get("Overpriced", 0))
     )
 
+@app.route("/analytics")
+def analytics():
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    cur = conn.cursor()
+
+    cur.execute("SELECT location, listed_price FROM properties")
+    rows = cur.fetchall()
+    conn.close()
+
+    if not rows:
+        return "No data available"
+
+    import pandas as pd
+    import matplotlib.pyplot as plt
+    import os
+
+    df = pd.DataFrame(rows, columns=["location", "price"])
+
+    # Create folder for charts
+    charts_dir = os.path.join(BASE_DIR, "static", "charts")
+    os.makedirs(charts_dir, exist_ok=True)
+
+    # 1️⃣ Average Price by Location
+    avg_price = df.groupby("location")["price"].mean().sort_values(ascending=False).head(10)
+
+    plt.figure(figsize=(10,6))
+    avg_price.plot(kind="bar")
+    plt.title("Top 10 Locations by Average Property Price")
+    plt.xlabel("Location")
+    plt.ylabel("Average Price (Lakhs)")
+    plt.xticks(rotation=45)
+
+    chart_path = os.path.join(charts_dir, "location_price.png")
+    plt.tight_layout()
+    plt.savefig(chart_path)
+    plt.close()
+
+    # 2️⃣ Price Distribution Graph
+    plt.figure(figsize=(8,5))
+    df["price"].hist(bins=15)
+    plt.title("Property Price Distribution")
+    plt.xlabel("Price (Lakhs)")
+    plt.ylabel("Number of Properties")
+
+    hist_path = os.path.join(charts_dir, "price_distribution.png")
+    plt.tight_layout()
+    plt.savefig(hist_path)
+    plt.close()
+
+    return render_template("analytics.html")
+
+@app.route("/add", methods=["GET", "POST"])
+def add_property():
+    msg = None
+
+    if request.method == "POST":
+        location = request.form["location"]
+        sqft = float(request.form["sqft"])
+        bath = int(request.form["bath"])
+        bhk = int(request.form["bhk"])
+        listed_price = float(request.form["listed_price"])
+
+        image_file = request.files.get("image")
+        filename = None
+
+        if image_file and image_file.filename:
+            filename = secure_filename(image_file.filename)
+            image_path = os.path.join(app.config["UPLOAD_FOLDER"], filename)
+            image_file.save(image_path)
+
+        conn = sqlite3.connect(DB_PATH)
+        cur = conn.cursor()
+        cur.execute("""
+            INSERT INTO properties (location, sqft, bath, bhk, listed_price, image)
+            VALUES (?, ?, ?, ?, ?, ?)
+        """, (location, sqft, bath, bhk, listed_price, filename))
+        conn.commit()
+        conn.close()
+
+        msg = "✅ Property posted successfully!"
+
+    # ✅ Get locations from model columns first
+    locations = sorted([c.replace("site_location_", "") for c in columns if c.startswith("site_location_")])
+
+    # ✅ Fallback: if for any reason model columns are empty, use DB distinct locations
+    if not locations:
+        conn = sqlite3.connect(DB_PATH)
+        conn.row_factory = sqlite3.Row
+        cur = conn.cursor()
+        cur.execute("SELECT DISTINCT location FROM properties ORDER BY location")
+        locations = [r["location"] for r in cur.fetchall()]
+        conn.close()
+
+    return render_template("add.html", msg=msg, locations=locations)
+
+@app.route("/admin/inquiries")
+def admin_inquiries():
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    cur = conn.cursor()
+
+    cur.execute("""
+        SELECT 
+            i.id AS inquiry_id,
+            i.property_id,
+            i.name,
+            i.phone,
+            i.message,
+            p.location,
+            p.sqft,
+            p.bhk,
+            p.bath,
+            p.listed_price
+        FROM inquiries i
+        JOIN properties p ON p.id = i.property_id
+        ORDER BY i.id DESC
+    """)
+    rows = cur.fetchall()
+    conn.close()
+
+    inquiries = []
+    for r in rows:
+        inquiries.append({
+            "inquiry_id": r["inquiry_id"],
+            "property_id": r["property_id"],
+            "name": r["name"],
+            "phone": r["phone"],
+            "message": r["message"],
+            "location": r["location"],
+            "sqft": r["sqft"],
+            "bhk": r["bhk"],
+            "bath": r["bath"],
+            "listed_price": r["listed_price"]
+        })
+
+    return render_template("admin_inquiries.html", inquiries=inquiries)
 
 if __name__ == "__main__":
     app.run(debug=True)

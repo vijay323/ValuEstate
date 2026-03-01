@@ -35,7 +35,16 @@ cur.executemany("""
 INSERT INTO properties (location, sqft, bath, bhk, listed_price)
 VALUES (?, ?, ?, ?, ?)
 """, properties)
-
+cur.execute("ALTER TABLE properties ADD COLUMN image TEXT")
+cur.execute("""
+CREATE TABLE IF NOT EXISTS inquiries (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    property_id INTEGER,
+    name TEXT,
+    phone TEXT,
+    message TEXT
+)
+""")
 conn.commit()
 
 cur.execute("SELECT COUNT(*) FROM properties")
