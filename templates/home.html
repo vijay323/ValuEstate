@@ -530,7 +530,9 @@
       {% for p in properties %}
         <a href="/property/{{ p['id'] }}">
           <div class="card">
-            {% if p["image"] %}
+            {% if p["image"] and p["image"].startswith("http") %}
+              <img class="card-img" src="{{ p['image'] }}" alt="Property Image">
+            {% elif p["image"] %}
               <img class="card-img" src="/static/uploads/{{ p['image'] }}" alt="Property Image">
             {% else %}
               <img class="card-img" src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2" alt="Property Image">
@@ -559,6 +561,7 @@
                 <span class="deal-badge {{ p['deal_class'] }}">{{ p["deal_rating"] }}</span>
                 <span class="score">Score {{ p["investment_score"] }}/100</span>
               </div>
+              <div class="meta">Fair range: ₹ {{ p["fair_low"] }} – ₹ {{ p["fair_high"] }} Lakhs</div>
             </div>
           </div>
         </a>

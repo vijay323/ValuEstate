@@ -1,104 +1,326 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <title>ValueState - Property Details</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
   <style>
-    body{font-family:Arial; margin:0; background:#f5f7fb;}
-    .navbar{background:#1e3a8a; color:#fff; padding:15px 30px; font-size:22px; font-weight:bold;}
-    .wrap{width:85%; margin:25px auto; display:grid; grid-template-columns: 2fr 1fr; gap:20px;}
-    .box{background:#fff; padding:18px; border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,0.1);}
-    .price{font-size:22px; font-weight:bold; color:#1e40af;}
-    .badge{padding:6px 10px; border-radius:6px; color:#fff; font-weight:bold; display:inline-block;}
-    .under{background:green;}
-    .over{background:red;}
-    .fair{background:orange;}
-    input, textarea{width:100%; padding:10px; margin:8px 0; border-radius:6px; border:1px solid #ccc;}
-    button{width:100%; padding:10px; background:#2563eb; color:#fff; border:0; border-radius:6px; cursor:pointer;}
+    body{background:#f5f7fb;}
+    .navbrand{
+      font-weight:900;
+      letter-spacing:0.2px;
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+    .brand-badge{
+      width:36px;height:36px;border-radius:12px;
+      display:inline-flex;align-items:center;justify-content:center;
+      background:rgba(255,255,255,0.15);
+      border:1px solid rgba(255,255,255,0.22);
+      font-weight:900;
+    }
+
+    .cardx{
+      border:1px solid rgba(15,23,42,0.10);
+      border-radius:18px;
+      box-shadow:0 12px 34px rgba(2,6,23,0.10);
+      overflow:hidden;
+      background:#fff;
+    }
+    .img-cover{
+      width:100%;
+      height:340px;
+      object-fit:cover;
+      display:block;
+      background:#e2e8f0;
+    }
+    .price{
+      font-size:22px;
+      font-weight:900;
+      color:#1e40af;
+      margin:0;
+    }
+    .muted{color:#64748b;}
+    .chip{
+      font-size:12px;
+      font-weight:900;
+      padding:7px 12px;
+      border-radius:999px;
+      display:inline-block;
+      border:1px solid rgba(15,23,42,0.10);
+      background:#fff;
+      white-space:nowrap;
+    }
+    .under{ background:#e7f7ee; color:#0f5132; }
+    .fair{ background:#fff4e5; color:#7a4a00; }
+    .over{ background:#fdecea; color:#8a1f17; }
 
     .deal-badge{
-  font-size:12px;
-  font-weight:700;
-  letter-spacing:0.2px;
-  padding:6px 10px;
-  border-radius:999px;
-  display:inline-block;
-  border:1px solid rgba(0,0,0,0.08);
-}
-.deal-excellent{ background:#e7f7ee; color:#0f5132; }
-.deal-good{ background:#e8f0fe; color:#1e3a8a; }
-.deal-fair{ background:#fff4e5; color:#7a4a00; }
-.deal-overpriced{ background:#fdecea; color:#8a1f17; }
-.score{
-  font-size:12px;
-  color:#0f172a;
-  background:#f1f5f9;
-  border:1px solid rgba(0,0,0,0.08);
-  padding:6px 10px;
-  border-radius:999px;
-  font-weight:700;
-  margin-left:10px;
-}
+      font-size:12px;
+      font-weight:900;
+      letter-spacing:0.2px;
+      padding:7px 12px;
+      border-radius:999px;
+      display:inline-block;
+      border:1px solid rgba(15,23,42,0.10);
+      background:#fff;
+    }
+    .deal-excellent{ background:#e7f7ee; color:#0f5132; }
+    .deal-good{ background:#e8f0fe; color:#1e3a8a; }
+    .deal-fair{ background:#fff4e5; color:#7a4a00; }
+    .deal-overpriced{ background:#fdecea; color:#8a1f17; }
+
+    .score{
+      font-size:12px;
+      background:#f1f5f9;
+      border:1px solid rgba(15,23,42,0.10);
+      padding:7px 12px;
+      border-radius:999px;
+      font-weight:900;
+      white-space:nowrap;
+      color:#0f172a;
+    }
+
+    .form-control, .form-select{
+      border-radius:14px;
+      padding:10px 12px;
+      border-color:rgba(15,23,42,0.14);
+    }
+    .form-control:focus, .form-select:focus{
+      border-color:rgba(37,99,235,0.55);
+      box-shadow:0 0 0 .25rem rgba(37,99,235,0.12);
+    }
+    .btn-primary{
+      background:#2563eb;
+      border-color:#2563eb;
+      border-radius:14px;
+      padding:11px 14px;
+      font-weight:900;
+    }
+    .btn-primary:hover{filter:brightness(0.95)}
+    .btn-outline-light{
+      border-radius:14px;
+      font-weight:900;
+    }
+    .krow{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      align-items:center;
+      margin-top:10px;
+    }
+    .section{margin-top:18px;}
+    .grid2{display:grid; grid-template-columns: 2fr 1fr; gap:18px;}
+    .box{background:#fff; padding:16px; border-radius:12px; box-shadow:0 2px 10px rgba(0,0,0,0.08);}
+    .label{font-size:12px; color:#64748b; margin-bottom:6px; font-weight:700; letter-spacing:0.2px;}
+    .input{width:100%; padding:10px; border:1px solid rgba(0,0,0,0.12); border-radius:10px;}
+
+    .btn-save{
+      width:100%;
+      padding:10px;
+      border:0;
+      border-radius:10px;
+      background:#1e3a8a;
+      color:#fff;
+      font-weight:800;
+      cursor:pointer;
+    }
+    .btn-back{
+      display:block;
+      width:100%;
+      padding:10px;
+      border:1px solid rgba(0,0,0,0.12);
+      border-radius:10px;
+      background:#0f172a;
+      color:#fff;
+      font-weight:800;
+      text-align:center;
+      text-decoration:none;
+      cursor:pointer;
+    }
   </style>
 </head>
+
 <body>
 
-<div class="navbar">🏠 ValueState – Property Details</div>
+<nav class="navbar navbar-expand-lg" style="background:#1e3a8a;">
+  <div class="container py-1">
+    <a class="navbar-brand text-white navbrand" href="/">
+      <span class="brand-badge">VS</span>
+      <span>Property Details</span>
+    </a>
+    <div class="d-flex gap-2">
+      <a class="btn btn-outline-light btn-sm" href="/">Listings</a>
+      <a class="btn btn-outline-light btn-sm" href="/dashboard">Dashboard</a>
+      <a class="btn btn-outline-light btn-sm" href="/add">Post</a>
+    </div>
+  </div>
+</nav>
 
-<div class="wrap">
-  <div class="box">
-    {% if p.image %}
-<img src="/static/uploads/{{ p.image }}" 
-     style="width:100%; height:320px; object-fit:cover; border-radius:10px;">
-{% else %}
-<img src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2"
-     style="width:100%; height:320px; object-fit:cover; border-radius:10px;">
-{% endif %}
-    <h2 style="margin-top:15px;">📍 {{ p.location }}</h2>
-    <p>{{ p.sqft }} sqft | 🛏 {{ p.bhk }} BHK | 🛁 {{ p.bath }} Bath</p>
+<div class="container my-4">
+  <div class="row g-4">
 
-    <p class="price">Listed Price: ₹ {{ p.listed_price }} Lakhs</p>
-    <p style="color:gray;">AI Predicted Fair Price: ₹ {{ p.predicted_price }} Lakhs</p>
+    <div class="col-lg-8">
+      <div class="cardx">
 
-    {% if p.recommendation == "Underpriced" %}
-      <div class="badge under">🟢 Underpriced Deal</div>
-    {% elif p.recommendation == "Overpriced" %}
-      <div class="badge over">🔴 Overpriced</div>
-    {% else %}
-      <div class="badge fair">⚖ Fair Price</div>
-    {% endif %}
-    <div style="margin:10px 0;">
-  <span class="deal-badge {{ p.deal_class }}">{{ p.deal_rating }}</span>
-  <span class="score">Score {{ p.investment_score }}/100</span>
+        {% if p.image %}
+          <img class="img-cover" src="{{ url_for('static', filename='uploads/' ~ p.image) }}" alt="Property">
+        {% else %}
+          <img class="img-cover" src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2" alt="Property">
+        {% endif %}
+
+        <div class="p-4">
+          <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+            <div>
+              <h4 class="mb-1 fw-bold">{{ p.location }}</h4>
+              <div class="muted">{{ p.sqft }} sqft • {{ p.bhk }} BHK • {{ p.bath }} Bath</div>
+            </div>
+
+            {% if p.recommendation == "Underpriced" %}
+              <span class="chip under">Underpriced Deal</span>
+            {% elif p.recommendation == "Overpriced" %}
+              <span class="chip over">Overpriced</span>
+            {% else %}
+              <span class="chip fair">Fair Price</span>
+            {% endif %}
+          </div>
+
+          <div class="mt-3">
+            <p class="price">₹ {{ p.listed_price }} Lakhs</p>
+            <div class="muted">AI Predicted Fair Price: ₹ {{ p.predicted_price }} Lakhs</div>
+            <div class="mt-3">
+  <span class="chip">
+    Risk Score: {{ p.risk_score }}/100 ({{ p.risk_text }})
+  </span>
 </div>
 
-<p style="color:gray;">AI fair value: ₹ {{ p.predicted_price }} Lakhs</p>
-    <hr style="margin:20px 0;">
-    <h3>About this property</h3>
-    <p>
-      This listing is analyzed by ValueState AI. The recommendation is generated by comparing the listed
-      price with the AI-predicted fair market value.
-    </p>
+{% if p.flags %}
+  <div class="mt-2">
+    <b>AI Warnings:</b>
+    <ul>
+      {% for f in p.flags %}
+        <li>{{ f }}</li>
+      {% endfor %}
+    </ul>
   </div>
-
-  <div class="box">
-    <h3>Contact / Inquiry</h3>
-
-{% if success %}
-  <p style="color:green; font-weight:bold;">{{ success }}</p>
 {% endif %}
 
-<form method="POST">
-  <input type="text" name="name" placeholder="Your Name" required>
-  <input type="tel" name="phone" placeholder="Phone Number" required>
-  <textarea name="message" rows="4" placeholder="I'm interested in this property" required></textarea>
-  <button type="submit">Send Inquiry</button>
-</form>
+            <div class="krow">
+              <span class="deal-badge {{ p.deal_class }}">{{ p.deal_rating }}</span>
+              <span class="score">Score {{ p.investment_score }}/100</span>
+            </div>
+          </div>
+          <p style="color:#64748b; font-weight:700; margin-top:6px;">Fair range: ₹ {{ p.fair_low }} – ₹ {{ p.fair_high }} Lakhs</p>
 
-    <p style="font-size:12px; color:gray; margin-top:10px;">
-      (For major project demo, inquiry can be stored in database later.)
-    </p>
+          <hr class="my-4">
+
+          <h6 class="fw-bold mb-2">About this property</h6>
+          <p class="mb-0 muted">
+            This listing is analyzed by ValueState AI. Recommendation is generated by comparing the listed
+            price with the AI-predicted fair market value.
+          </p>
+
+          <div class="section grid2">
+            <div class="box">
+              <div class="label">Price trend</div>
+              <canvas id="priceChart" height="110"></canvas>
+            </div>
+
+            <div class="box">
+              <div class="label">Update listed price (demo)</div>
+              <form method="POST" action="/property/{{ p.id }}/update_price">
+                <input class="input" type="number" name="new_price" step="0.01" placeholder="New listed price (Lakhs)" required>
+                <div style="height:10px;"></div>
+                <button class="btn-save" type="submit">Save price change</button>
+              </form>
+
+              <div style="height:10px;"></div>
+              <a class="btn-back" href="/">Back to listings</a>
+            </div>
+          </div>
+
+          <script>
+            const labels = {{ (labels or [])|tojson }};
+            const series = {{ (series or [])|tojson }};
+
+            const el = document.getElementById("priceChart");
+            if (el) {
+              const ctx = el.getContext("2d");
+              new Chart(ctx, {
+                type: "line",
+                data: {
+                  labels: labels,
+                  datasets: [{
+                    label: "Listed price (Lakhs)",
+                    data: series,
+                    tension: 0.25,
+                    fill: false,
+                    borderWidth: 2,
+                    pointRadius: 2
+                  }]
+                },
+                options: {
+                  responsive: true,
+                  plugins: { legend: { display: false } },
+                  scales: {
+                    x: { ticks: { maxRotation: 0, autoSkip: true } },
+                    y: { beginAtZero: false }
+                  }
+                }
+              });
+            }
+          </script>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-4">
+      <div class="cardx p-4">
+
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h5 class="mb-0 fw-bold">Contact / Inquiry</h5>
+        </div>
+
+        {% if success %}
+          <div class="alert alert-success fw-bold" role="alert" style="border-radius:14px;">
+            {{ success }}
+          </div>
+        {% endif %}
+
+        <form method="POST" action="/property/{{ p.id }}">
+          <div class="mb-3">
+            <label class="form-label fw-bold">Your Name</label>
+            <input class="form-control" type="text" name="name" placeholder="Enter your name" required>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-bold">Phone Number</label>
+            <input class="form-control" type="tel" name="phone" placeholder="Enter phone number" required>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-bold">Message</label>
+            <textarea class="form-control" name="message" rows="4" placeholder="I'm interested in this property" required></textarea>
+          </div>
+
+          <button class="btn btn-primary w-100" type="submit">Send Inquiry</button>
+        </form>
+
+        <div class="mt-3 muted" style="font-size:12px;">
+          Inquiry is stored in database (inquiries table).
+        </div>
+      </div>
+    </div>
+
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

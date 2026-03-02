@@ -1,7 +1,8 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, url_for
 from flask import session
 import joblib
 import pandas as pd
+from datetime import datetime
 import sqlite3
 from werkzeug.utils import secure_filename
 import os
@@ -77,6 +78,68 @@ def deal_class(rating):
         "Fair": "deal-fair",
         "Overpriced": "deal-overpriced"
     }.get(rating, "deal-fair")
+
+def clamp(x, lo, hi):
+    return max(lo, min(hi, x))
+
+def risk_meter(listed_price, predicted_price, sqft, bhk, bath):
+    listed_price = float(listed_price)
+    predicted_price = float(predicted_price) if float(predicted_price) > 0 else listed_price
+    sqft = float(sqft)
+    bhk = int(bhk)
+    bath = int(bath)
+
+    ratio = listed_price / predicted_price if predicted_price > 0 else 1.0
+    risk = 0
+
+    if ratio > 1.20:
+        risk += 45
+    elif ratio > 1.10:
+        risk += 30
+    elif ratio < 0.85:
+        risk += 18
+
+    if sqft <= 0:
+        risk += 20
+    else:
+        sqft_per_bhk = sqft / max(1, bhk)
+        if sqft_per_bhk < 300:
+            risk += 20
+        elif sqft_per_bhk < 400:
+            risk += 12
+
+    if bath > bhk + 2:
+        risk += 12
+
+    return int(clamp(risk, 0, 100))
+
+def risk_label(risk):
+    if risk <= 20:
+        return ("Low", "risk-low")
+    if risk <= 50:
+        return ("Medium", "risk-med")
+    return ("High", "risk-high")
+
+def anomaly_flags(listed_price, predicted_price, sqft, bhk, bath):
+    listed_price = float(listed_price)
+    predicted_price = float(predicted_price) if float(predicted_price) > 0 else listed_price
+    sqft = float(sqft)
+    bhk = int(bhk)
+    bath = int(bath)
+
+    flags = []
+    ratio = listed_price / predicted_price if predicted_price > 0 else 1.0
+
+    if ratio > 1.25:
+        flags.append("Significantly above AI fair value")
+    if ratio < 0.80:
+        flags.append("Unusually below AI fair value")
+    if sqft > 0 and (sqft / max(1, bhk)) < 300:
+        flags.append("Low area per bedroom")
+    if bath > bhk + 2:
+        flags.append("Unusual bath count vs BHK")
+
+    return flags[:3]
 
 @app.route("/", methods=["GET", "POST"])
 def home():
@@ -156,6 +219,8 @@ def home():
         rating = deal_rating(p["listed_price"], predicted_price)
         score = investment_score(p["listed_price"], predicted_price)
         dclass = deal_class(rating)
+        low = round(predicted_price * 0.92, 2)
+        high = round(predicted_price * 1.08, 2)
 
         analyzed_properties.append({
             "id": p["id"],
@@ -169,7 +234,9 @@ def home():
             "recommendation": rec,
             "deal_rating": rating,
             "deal_class": dclass,
-            "investment_score": score
+            "investment_score": score,
+            "fair_low": low,
+            "fair_high": high
         })
 
     cursor.execute("SELECT DISTINCT location FROM properties ORDER BY location")
@@ -197,18 +264,17 @@ def home():
 
 @app.route("/property/<int:pid>", methods=["GET", "POST"])
 def property(pid):
+    success = None
+
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     cur = conn.cursor()
 
     cur.execute("SELECT * FROM properties WHERE id = ?", (pid,))
     p = cur.fetchone()
-
     if p is None:
         conn.close()
         return "Property not found", 404
-
-    success = None
 
     if request.method == "POST":
         name = request.form["name"]
@@ -222,7 +288,26 @@ def property(pid):
         conn.commit()
         success = "Inquiry sent successfully!"
 
-    conn.close()
+    cur.execute("""
+        SELECT old_price, new_price, changed_at
+        FROM price_history
+        WHERE property_id = ?
+        ORDER BY id ASC
+    """, (pid,))
+    hist = cur.fetchall()
+
+    labels = []
+    series = []
+
+    if not hist:
+        labels = ["Current"]
+        series = [float(p["listed_price"])]
+    else:
+        labels.append("Initial")
+        series.append(float(hist[0]["old_price"]))
+        for h in hist:
+            labels.append(h["changed_at"])
+            series.append(float(h["new_price"]))
 
     predicted_price = predict_price(p["location"], p["sqft"], p["bath"], p["bhk"])
     rec = price_recommendation(p["listed_price"], predicted_price)
@@ -230,24 +315,32 @@ def property(pid):
     rating = deal_rating(p["listed_price"], predicted_price)
     score = investment_score(p["listed_price"], predicted_price)
     dclass = deal_class(rating)
+    risk = risk_meter(p["listed_price"], predicted_price, p["sqft"], p["bhk"], p["bath"])
+    risk_text, risk_class = risk_label(risk)
+    flags = anomaly_flags(p["listed_price"], predicted_price, p["sqft"], p["bhk"], p["bath"])
 
     property_data = {
-    "id": p["id"],
-    "location": p["location"],
-    "sqft": p["sqft"],
-    "bath": p["bath"],
-    "bhk": p["bhk"],
-    "listed_price": p["listed_price"],
-    "image": p["image"],
-    "predicted_price": round(predicted_price, 2),
-    "recommendation": rec,
-    "deal_rating": rating,
-    "deal_class": dclass,
-    "investment_score": score
-}
+        "id": p["id"],
+        "location": p["location"],
+        "sqft": p["sqft"],
+        "bath": p["bath"],
+        "bhk": p["bhk"],
+        "listed_price": p["listed_price"],
+        "image": p["image"],
+        "predicted_price": round(predicted_price, 2),
+        "recommendation": rec,
+        "deal_rating": rating,
+        "deal_class": dclass,
+        "investment_score": score,
+        "risk_score": risk,
+        "risk_text": risk_text,
+        "risk_class": risk_class,
+        "flags": flags
+    }
 
-    return render_template("property.html", p=property_data, success=success)
+    conn.close()
 
+    return render_template("property.html", p=property_data, success=success, labels=labels, series=series)
     
 
 @app.route("/dashboard")
@@ -464,6 +557,33 @@ def admin_inquiries():
         })
 
     return render_template("admin_inquiries.html", inquiries=inquiries)
+
+@app.route("/property/<int:pid>/update_price", methods=["POST"])
+def update_price(pid):
+    new_price = float(request.form["new_price"])
+
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    cur = conn.cursor()
+
+    cur.execute("SELECT listed_price FROM properties WHERE id = ?", (pid,))
+    row = cur.fetchone()
+    if row is None:
+        conn.close()
+        return "Property not found", 404
+
+    old_price = float(row["listed_price"])
+
+    if new_price != old_price:
+        cur.execute("UPDATE properties SET listed_price = ? WHERE id = ?", (new_price, pid))
+        cur.execute("""
+            INSERT INTO price_history (property_id, old_price, new_price, changed_at)
+            VALUES (?, ?, ?, ?)
+        """, (pid, old_price, new_price, datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
+        conn.commit()
+
+    conn.close()
+    return redirect(f"/property/{pid}")
 
 if __name__ == "__main__":
     app.run(debug=True)
