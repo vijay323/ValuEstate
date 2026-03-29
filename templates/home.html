@@ -3,94 +3,154 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>ValueState - Smart Real Estate Platform</title>
-
+  <title>ValueState - AI-Powered Real Estate Decision Support System</title>
   <style>
     :root{
-      --bg:#f5f7fb;
+      --bg:#f6f8fc;
       --card:#ffffff;
       --text:#0f172a;
       --muted:#64748b;
-      --nav:#1e3a8a;
+      --border:rgba(15,23,42,.10);
       --primary:#2563eb;
-      --border:rgba(15,23,42,0.10);
-      --shadow:0 10px 30px rgba(2,6,23,0.08);
-      --shadow2:0 6px 18px rgba(2,6,23,0.08);
-      --radius:14px;
+      --primary-dark:#1e40af;
+      --primary-soft:#eaf1ff;
+      --success-bg:#e8f7ee;
+      --success-text:#166534;
+      --warn-bg:#fff4e5;
+      --warn-text:#9a5a00;
+      --danger-bg:#fdecea;
+      --danger-text:#991b1b;
+      --shadow:0 10px 30px rgba(2,6,23,.08);
+      --radius:18px;
     }
 
     *{box-sizing:border-box}
+
     body{
-      font-family: Arial, sans-serif;
       margin:0;
-      background:var(--bg);
+      font-family:Inter, Arial, sans-serif;
       color:var(--text);
+      background:var(--bg);
     }
 
-    a{color:inherit; text-decoration:none}
+    a{text-decoration:none;color:inherit}
 
     .navbar{
-      background:var(--nav);
-      color:#fff;
-      padding:14px 22px;
+      position:sticky;
+      top:0;
+      z-index:50;
       display:flex;
       justify-content:space-between;
       align-items:center;
-      gap:16px;
-      position:sticky;
-      top:0;
-      z-index:10;
-      box-shadow:0 6px 18px rgba(2,6,23,0.18);
+      gap:20px;
+      padding:16px 28px;
+      background:#1d4ed8;
+      color:#fff;
+      box-shadow:0 8px 24px rgba(2,6,23,.12);
     }
+
     .brand{
-      font-size:20px;
-      font-weight:800;
-      letter-spacing:0.2px;
       display:flex;
       align-items:center;
-      gap:10px;
-      white-space:nowrap;
+      gap:12px;
+      font-weight:800;
+      font-size:20px;
     }
+
     .brand-badge{
-      width:34px; height:34px;
-      border-radius:10px;
+      width:40px;
+      height:40px;
+      border-radius:12px;
       display:inline-flex;
       align-items:center;
       justify-content:center;
-      background:rgba(255,255,255,0.12);
-      border:1px solid rgba(255,255,255,0.18);
-      font-weight:900;
+      background:rgba(255,255,255,.14);
+      border:1px solid rgba(255,255,255,.22);
+      font-weight:800;
     }
 
-    .navlinks{
+    .nav-right{
       display:flex;
+      align-items:center;
       gap:10px;
       flex-wrap:wrap;
-      justify-content:flex-end;
     }
+
     .navlink{
+      padding:10px 14px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.22);
+      background:rgba(255,255,255,.08);
+      font-weight:700;
       font-size:13px;
-      padding:8px 12px;
-      border-radius:10px;
-      border:1px solid rgba(255,255,255,0.25);
-      background:rgba(255,255,255,0.08);
+      transition:.2s ease;
     }
-    .navlink:hover{background:rgba(255,255,255,0.14)}
+
+    .navlink:hover{
+      background:rgba(255,255,255,.16);
+    }
+
+    .navlink-plain{
+      padding:10px 4px;
+      font-weight:700;
+      font-size:14px;
+      color:#fff;
+      opacity:.95;
+    }
+
+    .nav-user{
+      font-size:14px;
+      font-weight:600;
+      color:#dbeafe;
+      margin-right:4px;
+    }
 
     .wrap{
-      width:min(1180px, 92%);
-      margin:18px auto 44px auto;
+      width:min(1180px,92%);
+      margin:28px auto 50px;
     }
 
     .hero{
       display:grid;
-      grid-template-columns: 1.1fr 0.9fr;
-      gap:18px;
+      grid-template-columns:1.08fr .92fr;
+      gap:20px;
       align-items:start;
-      margin-top:10px;
+      margin-bottom:28px;
     }
-    @media (max-width: 960px){
-      .hero{grid-template-columns:1fr}
+
+    .hero-left{
+      padding-top:8px;
+    }
+
+    .eyebrow{
+      display:inline-flex;
+      align-items:center;
+      padding:8px 12px;
+      border-radius:999px;
+      background:#e8f0fe;
+      color:#1e3a8a;
+      font-size:12px;
+      font-weight:800;
+      letter-spacing:.02em;
+    }
+
+    .hero h1{
+      margin:14px 0 12px;
+      font-size:40px;
+      line-height:1.15;
+      letter-spacing:-.03em;
+    }
+
+    .hero h1 span{
+      color:var(--primary);
+    }
+
+    .hero p{
+      margin:0;
+      max-width:760px;
+      color:var(--muted);
+      font-size:16px;
+      line-height:1.75;
     }
 
     .panel{
@@ -100,247 +160,333 @@
       box-shadow:var(--shadow);
       overflow:hidden;
     }
+
     .panel-head{
-      padding:16px 16px 12px 16px;
+      padding:20px 22px;
       border-bottom:1px solid var(--border);
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:12px;
     }
+
     .panel-title{
-      font-size:16px;
+      font-size:20px;
       font-weight:800;
     }
+
     .panel-sub{
-      font-size:12px;
+      margin-top:6px;
       color:var(--muted);
-      margin-top:4px;
+      font-size:14px;
+      line-height:1.6;
     }
+
     .panel-body{
-      padding:14px 16px 16px 16px;
+      padding:22px;
     }
 
     .grid-form{
       display:grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap:10px;
-      align-items:end;
-    }
-    @media (max-width: 960px){
-      .grid-form{grid-template-columns: repeat(2, 1fr);}
-    }
-    @media (max-width: 560px){
-      .grid-form{grid-template-columns: 1fr;}
+      grid-template-columns:1fr 1fr;
+      gap:16px;
     }
 
     label{
-      font-size:12px;
-      color:var(--muted);
       display:block;
-      margin-bottom:6px;
+      margin:0 0 8px;
+      font-size:13px;
       font-weight:700;
+      color:#334155;
     }
+
     input, select{
       width:100%;
-      padding:10px 11px;
-      border-radius:12px;
-      border:1px solid rgba(15,23,42,0.14);
+      padding:13px 14px;
+      border-radius:14px;
+      border:1px solid rgba(15,23,42,.12);
       background:#fff;
-      outline:none;
       font-size:14px;
+      outline:none;
+      transition:.18s ease;
     }
+
     input:focus, select:focus{
-      border-color:rgba(37,99,235,0.55);
-      box-shadow:0 0 0 4px rgba(37,99,235,0.12);
+      border-color:rgba(37,99,235,.45);
+      box-shadow:0 0 0 4px rgba(37,99,235,.08);
+    }
+
+    .full{
+      grid-column:1 / -1;
+    }
+
+    .btn-row{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
     }
 
     .btn{
-      padding:11px 14px;
-      border-radius:12px;
-      border:0;
-      cursor:pointer;
-      font-weight:800;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      border:none;
+      border-radius:14px;
+      padding:13px 16px;
+      font-weight:700;
       font-size:14px;
-      background:var(--primary);
-      color:#fff;
-      width:100%;
-    }
-    .btn:hover{filter:brightness(0.95)}
-    .btn-ghost{
-      background:#fff;
-      color:var(--text);
-      border:1px solid rgba(15,23,42,0.14);
+      cursor:pointer;
+      transition:.2s ease;
     }
 
-    .result-box{
-      margin-top:12px;
-      padding:12px 12px;
-      border-radius:14px;
-      border:1px solid rgba(15,23,42,0.10);
-      background:linear-gradient(180deg, rgba(37,99,235,0.08), rgba(37,99,235,0.03));
+    .btn-primary{
+      background:var(--primary);
+      color:#fff;
     }
-    .result-row{
+
+    .btn-primary:hover{
+      background:var(--primary-dark);
+    }
+
+    .btn-secondary{
+      background:#eef2f7;
+      color:#1e293b;
+    }
+
+    .btn-secondary:hover{
+      background:#e2e8f0;
+    }
+
+    .stats-side{
+      display:grid;
+      gap:18px;
+    }
+
+    .stats-strip{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:12px;
+    }
+
+    .statbox{
+      background:#fff;
+      border:1px solid var(--border);
+      border-radius:16px;
+      box-shadow:var(--shadow);
+      padding:18px;
+    }
+
+    .statbox .k{
+      font-size:12px;
+      color:var(--muted);
+      font-weight:800;
+      text-transform:uppercase;
+      letter-spacing:.05em;
+    }
+
+    .statbox .v{
+      margin-top:8px;
+      font-size:22px;
+      line-height:1.2;
+      font-weight:800;
+      color:#0f172a;
+    }
+
+    .meta{
+      margin:6px 0 0;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.6;
+    }
+
+    .analysis-card{
+      margin-top:18px;
+      padding:18px;
+      border-radius:16px;
+      border:1px solid rgba(37,99,235,.12);
+      background:#f8fbff;
+    }
+
+    .result-head{
       display:flex;
       justify-content:space-between;
+      align-items:flex-start;
       gap:10px;
-      align-items:center;
       flex-wrap:wrap;
     }
+
     .result-big{
-      font-size:18px;
-      font-weight:900;
-      letter-spacing:0.2px;
+      font-size:26px;
+      font-weight:800;
+      color:#0f172a;
     }
-    .pill{
-      font-size:12px;
-      font-weight:900;
-      padding:7px 10px;
-      border-radius:999px;
-      border:1px solid rgba(15,23,42,0.10);
-      background:#fff;
-      color:var(--text);
+
+    .pill,.badge,.metric-pill,.risk-pill,.deal-pill{
       display:inline-flex;
       align-items:center;
       gap:8px;
+      padding:8px 12px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:800;
+      border:1px solid rgba(15,23,42,.08);
     }
-    .pill-under{ background:#e7f7ee; color:#0f5132; }
-    .pill-fair{ background:#fff4e5; color:#7a4a00; }
-    .pill-over{ background:#fdecea; color:#8a1f17; }
 
-    .filters{
+    .pill-under,.under{background:var(--success-bg);color:var(--success-text)}
+    .pill-fair,.fair{background:var(--warn-bg);color:var(--warn-text)}
+    .pill-over,.over{background:var(--danger-bg);color:var(--danger-text)}
+
+    .deal-excellent{background:var(--success-bg);color:var(--success-text)}
+    .deal-good{background:#e8f0fe;color:#1e3a8a}
+    .deal-fair{background:var(--warn-bg);color:var(--warn-text)}
+    .deal-poor{background:var(--danger-bg);color:var(--danger-text)}
+
+    .risk-low{background:var(--success-bg);color:var(--success-text)}
+    .risk-med{background:var(--warn-bg);color:var(--warn-text)}
+    .risk-high{background:var(--danger-bg);color:var(--danger-text)}
+
+    .analysis-grid{
       display:grid;
-      grid-template-columns: 1.2fr 1fr 0.8fr 0.8fr 1fr 0.8fr;
+      grid-template-columns:repeat(2,1fr);
+      gap:12px;
+      margin-top:14px;
+    }
+
+    .mini{
+      padding:14px;
+      border-radius:14px;
+      background:#fff;
+      border:1px solid rgba(15,23,42,.08);
+    }
+
+    .mini .label2{
+      font-size:12px;
+      color:var(--muted);
+      font-weight:800;
+      text-transform:uppercase;
+      letter-spacing:.04em;
+    }
+
+    .mini .value{
+      margin-top:8px;
+      font-size:19px;
+      font-weight:800;
+    }
+
+    .summary{
+      margin-top:14px;
+      padding:14px;
+      border-radius:14px;
+      background:#fff;
+      border:1px solid rgba(15,23,42,.08);
+      color:#334155;
+      line-height:1.65;
+      font-size:14px;
+    }
+
+    .flags{
+      margin:12px 0 0;
+      padding-left:18px;
+      color:#475569;
+    }
+
+    .section-head{
+      margin:34px 0 14px;
+      display:flex;
+      justify-content:space-between;
+      align-items:end;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+
+    .section-head h2{
+      margin:0;
+      font-size:22px;
+      letter-spacing:-.02em;
+    }
+
+    .section-head p{
+      margin:6px 0 0;
+      color:var(--muted);
+      font-size:14px;
+    }
+
+    .search-grid{
+      display:grid;
+      grid-template-columns:1.2fr 1fr .8fr .8fr 1fr .8fr;
       gap:10px;
       align-items:end;
-    }
-    @media (max-width: 960px){
-      .filters{grid-template-columns: repeat(2, 1fr);}
-    }
-    @media (max-width: 560px){
-      .filters{grid-template-columns: 1fr;}
-    }
-
-    .section-title{
-      margin:22px 0 10px 0;
-      font-size:16px;
-      font-weight:900;
-      letter-spacing:0.2px;
-    }
-    .section-meta{
-      color:var(--muted);
-      font-size:13px;
-      margin-bottom:14px;
     }
 
     .property-container{
       display:grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns:repeat(3,1fr);
       gap:18px;
-    }
-    @media (max-width: 1100px){
-      .property-container{ grid-template-columns: repeat(2, 1fr); }
-    }
-    @media (max-width: 700px){
-      .property-container{ grid-template-columns: 1fr; }
     }
 
     .card{
-      background:var(--card);
+      background:#fff;
       border:1px solid var(--border);
-      border-radius:16px;
+      border-radius:18px;
       overflow:hidden;
-      box-shadow:var(--shadow2);
-      transition:transform .18s ease, box-shadow .18s ease;
+      box-shadow:var(--shadow);
+      transition:.18s ease;
+      height:100%;
     }
+
     .card:hover{
-      transform:translateY(-3px);
-      box-shadow:0 14px 34px rgba(2,6,23,0.12);
+      transform:translateY(-4px);
+      box-shadow:0 18px 38px rgba(2,6,23,.12);
     }
+
     .card-img{
       width:100%;
-      height:180px;
+      height:210px;
       object-fit:cover;
       display:block;
       background:#e2e8f0;
     }
+
     .card-body{
-      padding:12px 12px 14px 12px;
+      padding:16px;
     }
+
     .card-top{
       display:flex;
       justify-content:space-between;
       align-items:flex-start;
       gap:10px;
     }
+
     .loc{
-      font-weight:900;
-      font-size:15px;
-      margin:0 0 4px 0;
-      line-height:1.2;
-    }
-    .meta{
-      color:var(--muted);
-      font-size:13px;
-      margin:4px 0 8px 0;
-    }
-    .price{
-      font-size:18px;
-      font-weight:900;
-      color:#1e40af;
-      margin:6px 0 4px 0;
-    }
-    .small{
-      color:var(--muted);
-      font-size:12.5px;
-      margin:0;
+      margin:0 0 5px;
+      font-size:17px;
+      font-weight:800;
+      line-height:1.3;
     }
 
-    .badge{
-      font-size:12px;
-      font-weight:900;
-      padding:6px 10px;
-      border-radius:999px;
-      border:1px solid rgba(15,23,42,0.10);
-      white-space:nowrap;
-      display:inline-block;
-      background:#fff;
+    .price{
+      margin:12px 0 6px;
+      font-size:22px;
+      color:#0f172a;
+      font-weight:800;
     }
-    .under{ background:#e7f7ee; color:#0f5132; }
-    .over{ background:#fdecea; color:#8a1f17; }
-    .fair{ background:#fff4e5; color:#7a4a00; }
+
+    .small{
+      margin:0;
+      color:var(--muted);
+      font-size:12.8px;
+    }
 
     .deal-row{
       display:flex;
       justify-content:space-between;
       align-items:center;
       gap:10px;
-      margin-top:10px;
+      flex-wrap:wrap;
+      margin-top:12px;
     }
-    .deal-badge{
-      font-size:12px;
-      font-weight:900;
-      letter-spacing:0.2px;
-      padding:6px 10px;
-      border-radius:999px;
-      display:inline-block;
-      border:1px solid rgba(15,23,42,0.10);
-      background:#fff;
-    }
-    .deal-excellent{ background:#e7f7ee; color:#0f5132; }
-    .deal-good{ background:#e8f0fe; color:#1e3a8a; }
-    .deal-fair{ background:#fff4e5; color:#7a4a00; }
-    .deal-overpriced{ background:#fdecea; color:#8a1f17; }
 
-    .score{
-      font-size:12px;
-      color:#0f172a;
-      background:#f1f5f9;
-      border:1px solid rgba(15,23,42,0.10);
-      padding:6px 10px;
-      border-radius:999px;
-      font-weight:900;
-      white-space:nowrap;
+    .meta-stack{
+      margin-top:10px;
+      display:grid;
+      gap:4px;
     }
 
     .pagination{
@@ -348,223 +494,338 @@
       justify-content:center;
       align-items:center;
       gap:10px;
-      margin:22px 0 0 0;
       flex-wrap:wrap;
+      margin-top:28px;
     }
-    .pagebtn{
-      padding:9px 12px;
+
+    .pagebtn,.pagenum{
+      padding:10px 14px;
       border-radius:12px;
-      border:1px solid rgba(15,23,42,0.14);
+      border:1px solid rgba(15,23,42,.12);
       background:#fff;
-      font-weight:900;
+      font-weight:700;
       font-size:13px;
     }
-    .pagebtn:hover{background:#f8fafc}
+
     .pagenum{
       color:var(--muted);
+    }
+
+    .footer{
+      margin-top:42px;
+      background:#0f172a;
+      color:#cbd5e1;
+      border-radius:18px;
+      padding:18px 22px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+
+    .footer-brand{
+      color:#fff;
       font-weight:800;
-      font-size:13px;
-      padding:8px 10px;
+      font-size:18px;
+    }
+
+    .footer-links{
+      display:flex;
+      gap:16px;
+      flex-wrap:wrap;
+      font-size:14px;
+    }
+
+    .footer-links a{
+      color:#cbd5e1;
+    }
+
+    .footer-links a:hover{
+      color:#fff;
+    }
+
+    @media (max-width:1000px){
+      .hero,
+      .property-container,
+      .stats-strip{
+        grid-template-columns:1fr;
+      }
+
+      .search-grid{
+        grid-template-columns:repeat(2,1fr);
+      }
+    }
+
+    @media (max-width:720px){
+      .grid-form,
+      .analysis-grid,
+      .btn-row,
+      .search-grid{
+        grid-template-columns:1fr;
+      }
+
+      .hero h1{
+        font-size:30px;
+      }
+
+      .navbar{
+        padding:14px 16px;
+      }
+
+      .wrap{
+        width:min(94%,1180px);
+      }
     }
   </style>
 </head>
-
 <body>
   <div class="navbar">
     <div class="brand">
       <span class="brand-badge">VS</span>
       <span>ValueState</span>
     </div>
-    <div class="navlinks">
+
+    <div class="nav-right">
+      <a class="navlink" href="/">Listings</a>
       <a class="navlink" href="/dashboard">Dashboard</a>
-      <a class="navlink" href="/analytics">Analytics</a>
       <a class="navlink" href="/add">Post Property</a>
+
+      {% if session.get('user_id') %}
+        <span class="nav-user">Hi, {{ session.get('user_name') }}</span>
+        <a class="navlink" href="/my_listings">My Listings</a>
+        <a class="navlink-plain" href="/logout">Logout</a>
+      {% else %}
+        <a class="navlink-plain" href="/login">Login</a>
+        <a class="navlink" href="/signup">Signup</a>
+      {% endif %}
     </div>
   </div>
 
   <div class="wrap">
-
     <div class="hero">
+      <div class="hero-left">
+        <span class="eyebrow">AI-Powered Real Estate Decision Support System</span>
+        <h1>Smarter property decisions with <span>AI</span></h1>
+       
 
-      <div class="panel">
-        <div class="panel-head">
-          <div>
+        <div class="panel" style="margin-top:22px;">
+          <div class="panel-head">
             <div class="panel-title">AI Price Analyzer</div>
-            <div class="panel-sub">Enter details to estimate fair value using your ML model</div>
+            <div class="panel-sub">Enter property details to generate a structured decision output from your trained model.</div>
           </div>
-        </div>
-        <div class="panel-body">
-          <form method="POST">
-            <div class="grid-form">
-              <div>
-                <label>Location</label>
-                <select name="location" required>
-                  <option value="">Select Location</option>
-                  {% for loc in locations %}
-                    <option value="{{ loc }}">{{ loc }}</option>
-                  {% endfor %}
-                </select>
+
+          <div class="panel-body">
+            <form method="POST">
+              <div class="grid-form">
+                <div>
+                  <label>Location</label>
+                  <select name="location" required>
+                    <option value="">Select location</option>
+                    {% for loc in locations %}
+                      <option value="{{ loc }}">{{ loc }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+
+                <div>
+                  <label>Total Area (sqft)</label>
+                  <input type="number" name="sqft" placeholder="Enter total sqft" required>
+                </div>
+
+                <div>
+                  <label>Bathrooms</label>
+                  <input type="number" name="bath" placeholder="Enter bathrooms" required>
+                </div>
+
+                <div>
+                  <label>BHK</label>
+                  <input type="number" name="bhk" placeholder="Enter BHK" required>
+                </div>
+
+                <div class="full">
+                  <label>Listed Price (Lakhs)</label>
+                  <input type="number" name="listed_price" step="0.01" placeholder="Enter listed price" required>
+                </div>
+
+                <div class="full btn-row">
+                  <button class="btn btn-primary" type="submit">Analyze Property</button>
+                  <a class="btn btn-secondary" href="/">Reset</a>
+                </div>
               </div>
+            </form>
 
-              <div>
-                <label>Sqft</label>
-                <input type="number" name="sqft" placeholder="Total sqft" required>
-              </div>
+            {% if analysis %}
+            <div class="analysis-card">
+              <div class="result-head">
+                <div>
+                  <div class="result-big">₹ {{ analysis.predicted_price }} Lakhs</div>
+                  <div class="meta">Predicted fair market price</div>
+                </div>
 
-              <div>
-                <label>Bath</label>
-                <input type="number" name="bath" placeholder="Bathrooms" required>
-              </div>
-
-              <div>
-                <label>BHK</label>
-                <input type="number" name="bhk" placeholder="BHK" required>
-              </div>
-
-              <div>
-                <label>Listed Price (Lakhs)</label>
-                <input type="number" name="listed_price" placeholder="Price" required>
-              </div>
-
-              <div style="grid-column:1 / -1; display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                <button class="btn" type="submit">Analyze</button>
-                <a class="btn btn-ghost" href="/" style="display:inline-flex; align-items:center; justify-content:center;">Reset</a>
-              </div>
-            </div>
-          </form>
-
-          {% if result %}
-            <div class="result-box">
-              <div class="result-row">
-                <div class="result-big">Predicted Fair Price: ₹ {{ result }} Lakhs</div>
-
-                {% if recommendation == "Underpriced" %}
+                {% if analysis.price_category == "Underpriced" %}
                   <span class="pill pill-under">Underpriced</span>
-                {% elif recommendation == "Overpriced" %}
+                {% elif analysis.price_category == "Overpriced" %}
                   <span class="pill pill-over">Overpriced</span>
                 {% else %}
-                  <span class="pill pill-fair">Fairly Priced</span>
+                  <span class="pill pill-fair">Fair</span>
                 {% endif %}
               </div>
-              <div class="meta" style="margin-top:8px;">
-                Tip: Fairly priced means within your ±10% band compared to predicted value.
+
+              <div class="analysis-grid">
+                <div class="mini">
+                  <div class="label2">Investment Score</div>
+                  <div class="value">{{ analysis.investment_score }}/100</div>
+                </div>
+
+                <div class="mini">
+                  <div class="label2">Deal Rating</div>
+                  <div class="value">
+                    <span class="deal-pill {{ analysis.deal_class }}">{{ analysis.deal_rating }}</span>
+                  </div>
+                </div>
+
+                <div class="mini">
+                  <div class="label2">Risk Level</div>
+                  <div class="value">
+                    <span class="risk-pill {{ analysis.risk_class }}">{{ analysis.risk_text }} ({{ analysis.risk_score }}/100)</span>
+                  </div>
+                </div>
+
+                <div class="mini">
+                  <div class="label2">AI Fair Value Range</div>
+                  <div class="value" style="font-size:17px">
+                    ₹ {{ analysis.ai_fair_value_low }} - ₹ {{ analysis.ai_fair_value_high }}
+                  </div>
+                </div>
+              </div>
+
+              <div class="summary">
+                <strong>Decision Summary:</strong> {{ analysis.decision_summary }}
+                {% if analysis.flags %}
+                  <ul class="flags">
+                    {% for f in analysis.flags %}
+                      <li>{{ f }}</li>
+                    {% endfor %}
+                  </ul>
+                {% endif %}
               </div>
             </div>
-          {% endif %}
-        </div>
-      </div>
-
-      <div class="panel">
-        <div class="panel-head">
-          <div>
-            <div class="panel-title">Search Listings</div>
-            <div class="panel-sub">Filter properties by location, BHK, price and sorting</div>
+            {% endif %}
           </div>
         </div>
-        <div class="panel-body">
-          <form method="GET">
-            <div class="filters">
-
-              <div>
-                <label>Search</label>
-                <input type="text" name="q" placeholder="Search location..." value="{{ q }}">
-              </div>
-
-              <div>
-                <label>Location</label>
-                <select name="location">
-                  <option value="">All Locations</option>
-                  {% for loc in locations %}
-                    <option value="{{ loc }}" {% if q_location==loc %}selected{% endif %}>{{ loc }}</option>
-                  {% endfor %}
-                </select>
-              </div>
-
-              <div>
-                <label>BHK</label>
-                <select name="bhk">
-                  <option value="">Any</option>
-                  {% for b in [1,2,3,4,5] %}
-                    <option value="{{ b }}" {% if q_bhk==b|string %}selected{% endif %}>{{ b }} BHK</option>
-                  {% endfor %}
-                </select>
-              </div>
-
-              <div>
-                <label>Min Price</label>
-                <input type="number" name="min_price" placeholder="Min" value="{{ min_price }}">
-              </div>
-
-              <div>
-                <label>Max Price</label>
-                <input type="number" name="max_price" placeholder="Max" value="{{ max_price }}">
-              </div>
-
-              <div>
-                <label>Sort</label>
-                <select name="sort">
-                  <option value="new" {% if sort_by=="new" %}selected{% endif %}>Newest</option>
-                  <option value="price_asc" {% if sort_by=="price_asc" %}selected{% endif %}>Price: Low to High</option>
-                  <option value="price_desc" {% if sort_by=="price_desc" %}selected{% endif %}>Price: High to Low</option>
-                </select>
-              </div>
-
-              <div style="grid-column:1 / -1; display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                <button class="btn" type="submit">Apply Filters</button>
-                <a class="btn btn-ghost" href="/" style="display:inline-flex; align-items:center; justify-content:center;">Clear</a>
-              </div>
-
-            </div>
-          </form>
-        </div>
       </div>
 
+      
+
+        <div class="panel">
+          <div class="panel-head">
+            <div class="panel-title">Search Listings</div>
+            <div class="panel-sub">Filter properties by location, BHK, price range, and sorting.</div>
+          </div>
+
+          <div class="panel-body">
+            <form method="GET">
+              <div class="search-grid">
+                <div>
+                  <label>Search</label>
+                  <input type="text" name="q" placeholder="Search location..." value="{{ q }}">
+                </div>
+
+                <div>
+                  <label>Location</label>
+                  <select name="location">
+                    <option value="">All locations</option>
+                    {% for loc in locations %}
+                      <option value="{{ loc }}" {% if q_location==loc %}selected{% endif %}>{{ loc }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+
+                <div>
+                  <label>BHK</label>
+                  <select name="bhk">
+                    <option value="">Any</option>
+                    {% for b in [1,2,3,4,5] %}
+                      <option value="{{ b }}" {% if q_bhk==b|string %}selected{% endif %}>{{ b }} BHK</option>
+                    {% endfor %}
+                  </select>
+                </div>
+
+                <div>
+                  <label>Min Price</label>
+                  <input type="number" name="min_price" placeholder="Min" value="{{ min_price }}">
+                </div>
+
+                <div>
+                  <label>Max Price</label>
+                  <input type="number" name="max_price" placeholder="Max" value="{{ max_price }}">
+                </div>
+
+                <div>
+                  <label>Sort</label>
+                  <select name="sort">
+                    <option value="new" {% if sort_by=="new" %}selected{% endif %}>Newest</option>
+                    <option value="price_asc" {% if sort_by=="price_asc" %}selected{% endif %}>Price: Low to High</option>
+                    <option value="price_desc" {% if sort_by=="price_desc" %}selected{% endif %}>Price: High to Low</option>
+                  </select>
+                </div>
+
+                <div class="full btn-row">
+                  <button class="btn btn-primary" type="submit">Apply Filters</button>
+                  <a class="btn btn-secondary" href="/">Clear</a>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <div class="section-title">Available Properties</div>
-    <div class="section-meta">
-      Showing {{ properties|length }} properties on this page
+    <div class="section-head">
+      <div>
+        <h2>Available Properties</h2>
+        <p>Showing {{ properties|length }} properties on this page</p>
+      </div>
     </div>
 
     <div class="property-container">
       {% for p in properties %}
-        <a href="/property/{{ p['id'] }}">
-          <div class="card">
-            {% if p["image"] and p["image"].startswith("http") %}
-              <img class="card-img" src="{{ p['image'] }}" alt="Property Image">
-            {% elif p["image"] %}
-              <img class="card-img" src="/static/uploads/{{ p['image'] }}" alt="Property Image">
-            {% else %}
-              <img class="card-img" src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2" alt="Property Image">
-            {% endif %}
+      <a href="/property/{{ p['id'] }}">
+        <div class="card">
+          <img class="card-img" src="{{ p.image_src }}" alt="Property image">
 
-            <div class="card-body">
-              <div class="card-top">
-                <div>
-                  <div class="loc">{{ p["location"] }}</div>
-                  <div class="meta">{{ p["sqft"] }} sqft • {{ p["bhk"] }} BHK • {{ p["bath"] }} Bath</div>
-                </div>
-
-                {% if p["recommendation"] == "Underpriced" %}
-                  <span class="badge under">Underpriced</span>
-                {% elif p["recommendation"] == "Overpriced" %}
-                  <span class="badge over">Overpriced</span>
-                {% else %}
-                  <span class="badge fair">Fair</span>
-                {% endif %}
+          <div class="card-body">
+            <div class="card-top">
+              <div>
+                <div class="loc">{{ p["location"] }}</div>
+                <p class="meta">{{ p["sqft"] }} sqft • {{ p["bhk"] }} BHK • {{ p["bath"] }} Bath</p>
               </div>
 
-              <div class="price">₹ {{ p["listed_price"] }} Lakhs</div>
-              <p class="small">AI Predicted: ₹ {{ p["predicted_price"] }} Lakhs</p>
+              {% if p["price_category"] == "Underpriced" %}
+                <span class="badge under">Underpriced</span>
+              {% elif p["price_category"] == "Overpriced" %}
+                <span class="badge over">Overpriced</span>
+              {% else %}
+                <span class="badge fair">Fair</span>
+              {% endif %}
+            </div>
 
-              <div class="deal-row">
-                <span class="deal-badge {{ p['deal_class'] }}">{{ p["deal_rating"] }}</span>
-                <span class="score">Score {{ p["investment_score"] }}/100</span>
-              </div>
-              <div class="meta">Fair range: ₹ {{ p["fair_low"] }} – ₹ {{ p["fair_high"] }} Lakhs</div>
+            <div class="price">₹ {{ p["listed_price"] }} Lakhs</div>
+            <p class="small">AI Fair Price: ₹ {{ p["predicted_price"] }} Lakhs</p>
+
+            <div class="deal-row">
+              <span class="deal-pill {{ p['deal_class'] }}">{{ p["deal_rating"] }}</span>
+              <span class="metric-pill">Score {{ p["investment_score"] }}/100</span>
+            </div>
+
+            <div class="meta-stack">
+              <p class="meta">AI Fair Value Range: ₹ {{ p["ai_fair_value_low"] }} - ₹ {{ p["ai_fair_value_high"] }} Lakhs</p>
+              <p class="meta">Risk: {{ p["risk_text"] }} ({{ p["risk_score"] }}/100)</p>
             </div>
           </div>
-        </a>
+        </div>
+      </a>
       {% endfor %}
     </div>
 
@@ -580,6 +841,21 @@
       {% endif %}
     </div>
 
+    <div class="footer">
+      <div class="footer-brand">ValueState</div>
+      <div class="footer-links">
+        <a href="/">Home</a>
+        <a href="/dashboard">Dashboard</a>
+        <a href="/add">Post Property</a>
+        {% if session.get('user_id') %}
+          <a href="/my_listings">My Listings</a>
+          <a href="/logout">Logout</a>
+        {% else %}
+          <a href="/login">Login</a>
+          <a href="/signup">Signup</a>
+        {% endif %}
+      </div>
+    </div>
   </div>
 </body>
 </html>

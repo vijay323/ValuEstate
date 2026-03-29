@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Listings - ValueState</title>
+    <style>
+        body{font-family:Arial,sans-serif;background:#f5f7fb;margin:0;padding:30px}
+        h1{margin-bottom:20px}
+        .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px}
+        .card{background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,.08)}
+        .card img{width:100%;height:200px;object-fit:cover}
+        .content{padding:15px}
+        .tag{display:inline-block;padding:6px 10px;border-radius:999px;background:#eef2ff;color:#3730a3;font-size:13px}
+        a{text-decoration:none;color:#2563eb}
+    </style>
+</head>
+<body>
+    <h1>My Listings</h1>
+    <p><a href="/">← Back to Home</a></p>
+
+    {% if properties %}
+    <div class="grid">
+        {% for p in properties %}
+        <div class="card">
+            <img src="{{ p.image_src }}" alt="Property Image">
+            <div class="content">
+                <h3>{{ p.location }}</h3>
+                <p>{{ p.bhk }} BHK • {{ p.sqft }} sqft • ₹{{ p.listed_price }} Lakh</p>
+                <p><span class="tag">{{ p.recommendation }}</span></p>
+                <p><a href="/property/{{ p.id }}">View Details</a></p>
+                <p>
+    <a href="/edit/{{ p.id }}">✏️ Edit</a> |
+    <a href="/delete/{{ p.id }}" onclick="return confirm('Delete this property?')">🗑 Delete</a>
+</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+        <p>You have not added any property yet.</p>
+    {% endif %}
+</body>
+</html>

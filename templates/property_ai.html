@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Property AI Assistant</title>
+    <style>
+        body{
+            font-family:Arial,sans-serif;
+            background:#f4f7fb;
+            margin:0;
+            padding:30px;
+        }
+        .container{
+            max-width:800px;
+            margin:auto;
+            background:white;
+            padding:25px;
+            border-radius:14px;
+            box-shadow:0 8px 24px rgba(0,0,0,.08);
+        }
+        h1,h2,h3{
+            margin-top:0;
+        }
+        .meta{
+            background:#f8fafc;
+            padding:15px;
+            border-radius:10px;
+            margin-bottom:20px;
+        }
+        textarea{
+            width:100%;
+            height:110px;
+            padding:12px;
+            border:1px solid #ccc;
+            border-radius:10px;
+            resize:vertical;
+            font-size:15px;
+        }
+        button{
+            margin-top:12px;
+            padding:12px 18px;
+            border:none;
+            border-radius:10px;
+            background:#2563eb;
+            color:white;
+            cursor:pointer;
+            font-size:15px;
+        }
+        .answer{
+            margin-top:20px;
+            padding:16px;
+            background:#eef6ff;
+            border-left:4px solid #2563eb;
+            border-radius:10px;
+        }
+        .tips{
+            margin-top:20px;
+            background:#f9fafb;
+            padding:15px;
+            border-radius:10px;
+        }
+        a{
+            text-decoration:none;
+            color:#2563eb;
+        }
+        .badge{
+            display:inline-block;
+            padding:6px 10px;
+            border-radius:999px;
+            background:#e0e7ff;
+            color:#3730a3;
+            font-size:13px;
+            margin-top:8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <p><a href="/property/{{ p.id }}">← Back to Property</a></p>
+
+        <h1>AI Assistant</h1>
+
+        <div class="meta">
+            <h3>{{ p.location }}</h3>
+            <p>{{ p.bhk }} BHK • {{ p.sqft }} sqft • ₹{{ p.listed_price }} Lakh</p>
+            <p>AI Estimated Price: ₹{{ analyzed.predicted_price }} Lakh</p>
+            <span class="badge">{{ analyzed.recommendation }}</span>
+        </div>
+
+        <form method="POST" action="/property_ai/{{ p.id }}">
+            <label><strong>Ask about this property:</strong></label>
+            <textarea name="question" placeholder="Example: Is this property overpriced? Should I buy it for investment?">{{ question if question else '' }}</textarea>
+            <button type="submit">Ask AI</button>
+        </form>
+
+        {% if answer %}
+        <div class="answer">
+            <h3>Assistant Response</h3>
+            <p>{{ answer }}</p>
+        </div>
+        {% endif %}
+
+        <div class="tips">
+            <h3>Try these questions</h3>
+            <p>• Is this property overpriced?</p>
+            <p>• Should I buy this property?</p>
+            <p>• Is this a good investment?</p>
+            <p>• Why is this property marked as fair price?</p>
+            <p>• Explain this property summary</p>
+        </div>
+    </div>
+</body>
+</html>

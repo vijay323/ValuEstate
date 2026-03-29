@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login - ValueState</title>
+    <style>
+        body{font-family:Arial,sans-serif;background:#f4f7fb}
+        .box{width:360px;margin:80px auto;background:#fff;padding:30px;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.08)}
+        input{width:100%;padding:12px;margin:10px 0;border:1px solid #ccc;border-radius:8px}
+        button{width:100%;padding:12px;background:#2563eb;color:#fff;border:none;border-radius:8px;font-size:16px}
+        a{text-decoration:none;color:#2563eb}
+        .msg{color:red;margin-bottom:10px}
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h2>Login</h2>
+
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="msg">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST">
+            <input type="email" name="email" placeholder="Enter email" required>
+            <input type="password" name="password" placeholder="Enter password" required>
+            <button type="submit">Login</button>
+        </form>
+
+        <p>Don't have an account? <a href="/signup">Signup</a></p>
+    </div>
+</body>
+</html>

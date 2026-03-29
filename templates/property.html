@@ -4,323 +4,216 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <title>ValueState - Property Details</title>
-
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
+  <title>ValueState - Property Decision View</title>
   <style>
-    body{background:#f5f7fb;}
-    .navbrand{
-      font-weight:900;
-      letter-spacing:0.2px;
-      display:flex;
-      align-items:center;
-      gap:10px;
+    :root{
+      --bg:#f6f8fc;
+      --card:#fff;
+      --text:#0f172a;
+      --muted:#64748b;
+      --border:rgba(15,23,42,.10);
+      --primary:#2563eb;
+      --primary-dark:#1e3a8a;
+      --success-bg:#e7f7ee;
+      --success-text:#166534;
+      --warn-bg:#fff4e5;
+      --warn-text:#9a5a00;
+      --danger-bg:#fdecea;
+      --danger-text:#991b1b;
+      --shadow:0 14px 34px rgba(2,6,23,.08);
+      --radius:18px;
     }
-    .brand-badge{
-      width:36px;height:36px;border-radius:12px;
-      display:inline-flex;align-items:center;justify-content:center;
-      background:rgba(255,255,255,0.15);
-      border:1px solid rgba(255,255,255,0.22);
-      font-weight:900;
-    }
-
-    .cardx{
-      border:1px solid rgba(15,23,42,0.10);
-      border-radius:18px;
-      box-shadow:0 12px 34px rgba(2,6,23,0.10);
-      overflow:hidden;
-      background:#fff;
-    }
-    .img-cover{
-      width:100%;
-      height:340px;
-      object-fit:cover;
-      display:block;
-      background:#e2e8f0;
-    }
-    .price{
-      font-size:22px;
-      font-weight:900;
-      color:#1e40af;
+    *{box-sizing:border-box}
+    body{
       margin:0;
+      font-family:Inter, Arial, sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(900px 420px at 0% -10%, rgba(37,99,235,.12), transparent 55%),
+        radial-gradient(700px 360px at 100% 0%, rgba(30,58,138,.10), transparent 50%),
+        var(--bg);
     }
-    .muted{color:#64748b;}
-    .chip{
-      font-size:12px;
-      font-weight:900;
-      padding:7px 12px;
-      border-radius:999px;
-      display:inline-block;
-      border:1px solid rgba(15,23,42,0.10);
-      background:#fff;
-      white-space:nowrap;
+    .navbar{
+      display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;
+      padding:16px 24px;background:linear-gradient(135deg, #1e3a8a, #2563eb);color:#fff;
+      box-shadow:0 10px 24px rgba(2,6,23,.18)
     }
-    .under{ background:#e7f7ee; color:#0f5132; }
-    .fair{ background:#fff4e5; color:#7a4a00; }
-    .over{ background:#fdecea; color:#8a1f17; }
-
-    .deal-badge{
-      font-size:12px;
-      font-weight:900;
-      letter-spacing:0.2px;
-      padding:7px 12px;
-      border-radius:999px;
-      display:inline-block;
-      border:1px solid rgba(15,23,42,0.10);
-      background:#fff;
-    }
-    .deal-excellent{ background:#e7f7ee; color:#0f5132; }
-    .deal-good{ background:#e8f0fe; color:#1e3a8a; }
-    .deal-fair{ background:#fff4e5; color:#7a4a00; }
-    .deal-overpriced{ background:#fdecea; color:#8a1f17; }
-
-    .score{
-      font-size:12px;
-      background:#f1f5f9;
-      border:1px solid rgba(15,23,42,0.10);
-      padding:7px 12px;
-      border-radius:999px;
-      font-weight:900;
-      white-space:nowrap;
-      color:#0f172a;
-    }
-
-    .form-control, .form-select{
-      border-radius:14px;
-      padding:10px 12px;
-      border-color:rgba(15,23,42,0.14);
-    }
-    .form-control:focus, .form-select:focus{
-      border-color:rgba(37,99,235,0.55);
-      box-shadow:0 0 0 .25rem rgba(37,99,235,0.12);
-    }
-    .btn-primary{
-      background:#2563eb;
-      border-color:#2563eb;
-      border-radius:14px;
-      padding:11px 14px;
-      font-weight:900;
-    }
-    .btn-primary:hover{filter:brightness(0.95)}
-    .btn-outline-light{
-      border-radius:14px;
-      font-weight:900;
-    }
-    .krow{
-      display:flex;
-      flex-wrap:wrap;
-      gap:10px;
-      align-items:center;
-      margin-top:10px;
-    }
-    .section{margin-top:18px;}
-    .grid2{display:grid; grid-template-columns: 2fr 1fr; gap:18px;}
-    .box{background:#fff; padding:16px; border-radius:12px; box-shadow:0 2px 10px rgba(0,0,0,0.08);}
-    .label{font-size:12px; color:#64748b; margin-bottom:6px; font-weight:700; letter-spacing:0.2px;}
-    .input{width:100%; padding:10px; border:1px solid rgba(0,0,0,0.12); border-radius:10px;}
-
-    .btn-save{
-      width:100%;
-      padding:10px;
-      border:0;
-      border-radius:10px;
-      background:#1e3a8a;
-      color:#fff;
-      font-weight:800;
-      cursor:pointer;
-    }
-    .btn-back{
-      display:block;
-      width:100%;
-      padding:10px;
-      border:1px solid rgba(0,0,0,0.12);
-      border-radius:10px;
-      background:#0f172a;
-      color:#fff;
-      font-weight:800;
-      text-align:center;
-      text-decoration:none;
-      cursor:pointer;
-    }
+    .navbrand{display:flex;align-items:center;gap:12px;font-size:20px;font-weight:900}
+    .brand-badge{width:38px;height:38px;border-radius:12px;display:inline-flex;align-items:center;justify-content:center;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.24)}
+    .navlinks{display:flex;gap:10px;flex-wrap:wrap}
+    .navlinks a{color:#fff;text-decoration:none;padding:9px 13px;border-radius:12px;border:1px solid rgba(255,255,255,.24);background:rgba(255,255,255,.08);font-size:13px;font-weight:800}
+    .wrap{width:min(1180px,92%);margin:24px auto 42px}
+    .hero{display:grid;grid-template-columns:1.2fr .8fr;gap:18px;align-items:start}
+    .cardx,.sidecard,.chartcard{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+    .img-cover{width:100%;height:380px;object-fit:cover;display:block;background:#e2e8f0}
+    .content{padding:22px}
+    .headline{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
+    h1{margin:0;font-size:28px;line-height:1.2}
+    .sub{margin-top:8px;color:var(--muted);font-size:15px}
+    .price{margin:18px 0 6px;font-size:28px;font-weight:900;color:var(--primary-dark)}
+    .muted{color:var(--muted)}
+    .chip,.deal-badge,.risk-pill,.metric-pill{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;font-size:12px;font-weight:900;border:1px solid rgba(15,23,42,.08);background:#fff}
+    .under{background:var(--success-bg);color:var(--success-text)}
+    .fair{background:var(--warn-bg);color:var(--warn-text)}
+    .over{background:var(--danger-bg);color:var(--danger-text)}
+    .deal-excellent{background:var(--success-bg);color:var(--success-text)}
+    .deal-good{background:#e8f0fe;color:#1e3a8a}
+    .deal-fair{background:var(--warn-bg);color:var(--warn-text)}
+    .deal-poor{background:var(--danger-bg);color:var(--danger-text)}
+    .risk-low{background:var(--success-bg);color:var(--success-text)}
+    .risk-med{background:var(--warn-bg);color:var(--warn-text)}
+    .risk-high{background:var(--danger-bg);color:var(--danger-text)}
+    .metric-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:18px}
+    .metric-box{padding:16px;border-radius:16px;background:#f8fbff;border:1px solid rgba(37,99,235,.10)}
+    .metric-label{font-size:12px;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:.04em}
+    .metric-value{margin-top:8px;font-size:22px;font-weight:900}
+    .summary{margin-top:16px;padding:16px;border-radius:16px;background:#fff;border:1px solid rgba(15,23,42,.08);line-height:1.7;color:#334155}
+    .section-title{margin:0 0 12px;font-size:17px;font-weight:900}
+    .list{margin:0;padding-left:18px;color:#475569;line-height:1.7}
+    .sidecard{padding:20px}
+    .chartcard{padding:20px;margin-top:18px}
+    .cta{display:grid;gap:10px;margin-top:18px}
+    .btn{display:inline-flex;justify-content:center;align-items:center;padding:12px 14px;border-radius:14px;font-weight:800;text-decoration:none}
+    .btn-primary{background:var(--primary);color:#fff}
+    .btn-secondary{background:#eff6ff;color:var(--primary-dark)}
+    canvas{width:100% !important;height:260px !important}
+    @media (max-width:980px){.hero{grid-template-columns:1fr}}
+    @media (max-width:680px){.metric-grid{grid-template-columns:1fr}.img-cover{height:270px}.content{padding:18px}h1{font-size:24px}}
   </style>
 </head>
-
 <body>
-
-<nav class="navbar navbar-expand-lg" style="background:#1e3a8a;">
-  <div class="container py-1">
-    <a class="navbar-brand text-white navbrand" href="/">
-      <span class="brand-badge">VS</span>
-      <span>Property Details</span>
-    </a>
-    <div class="d-flex gap-2">
-      <a class="btn btn-outline-light btn-sm" href="/">Listings</a>
-      <a class="btn btn-outline-light btn-sm" href="/dashboard">Dashboard</a>
-      <a class="btn btn-outline-light btn-sm" href="/add">Post</a>
+  <div class="navbar">
+    <div class="navbrand"><span class="brand-badge">VS</span><span>Property Decision View</span></div>
+    <div class="navlinks">
+      <a href="/">Listings</a>
+      <a href="/dashboard">Dashboard</a>
+      <a href="/add">Post Property</a>
     </div>
   </div>
-</nav>
-
-<div class="container my-4">
-  <div class="row g-4">
-
-    <div class="col-lg-8">
-      <div class="cardx">
-
-        {% if p.image %}
-          <img class="img-cover" src="{{ url_for('static', filename='uploads/' ~ p.image) }}" alt="Property">
-        {% else %}
-          <img class="img-cover" src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2" alt="Property">
-        {% endif %}
-
-        <div class="p-4">
-          <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
-            <div>
-              <h4 class="mb-1 fw-bold">{{ p.location }}</h4>
-              <div class="muted">{{ p.sqft }} sqft • {{ p.bhk }} BHK • {{ p.bath }} Bath</div>
+<div style="margin-top:20px;padding:15px;background:#f8fafc;border-radius:10px;">
+    <h3>Owner Details</h3>
+    <p><strong>Name:</strong> {{ owner_name if owner_name else 'Admin Listing' }}</p>
+    <p><strong>Email:</strong> {{ owner_email if owner_email else 'Not available' }}</p>
+</div>
+  <div class="wrap">
+    <div class="hero">
+      <div>
+        <div class="cardx">
+          <img class="img-cover" src="{{ p.image_src }}" alt="Property image">
+          <div class="content">
+            <div class="headline">
+              <div>
+                <h1>{{ p.location }}</h1>
+                <div class="sub">{{ p.sqft }} sqft • {{ p.bhk }} BHK • {{ p.bath }} Bath</div>
+              </div>
+              {% if p.price_category == "Underpriced" %}
+                <span class="chip under">Underpriced</span>
+              {% elif p.price_category == "Overpriced" %}
+                <span class="chip over">Overpriced</span>
+              {% else %}
+                <span class="chip fair">Fair</span>
+              {% endif %}
             </div>
 
-            {% if p.recommendation == "Underpriced" %}
-              <span class="chip under">Underpriced Deal</span>
-            {% elif p.recommendation == "Overpriced" %}
-              <span class="chip over">Overpriced</span>
-            {% else %}
-              <span class="chip fair">Fair Price</span>
-            {% endif %}
-          </div>
-
-          <div class="mt-3">
-            <p class="price">₹ {{ p.listed_price }} Lakhs</p>
+            <div class="price">₹ {{ p.listed_price }} Lakhs</div>
             <div class="muted">AI Predicted Fair Price: ₹ {{ p.predicted_price }} Lakhs</div>
-            <div class="mt-3">
-  <span class="chip">
-    Risk Score: {{ p.risk_score }}/100 ({{ p.risk_text }})
-  </span>
-</div>
 
-{% if p.flags %}
-  <div class="mt-2">
-    <b>AI Warnings:</b>
-    <ul>
-      {% for f in p.flags %}
-        <li>{{ f }}</li>
-      {% endfor %}
-    </ul>
-  </div>
-{% endif %}
+            <div class="metric-grid">
+              <div class="metric-box">
+                <div class="metric-label">Investment Score</div>
+                <div class="metric-value">{{ p.investment_score }}/100</div>
+              </div>
+              <div class="metric-box">
+                <div class="metric-label">Deal Rating</div>
+                <div class="metric-value"><span class="deal-badge {{ p.deal_class }}">{{ p.deal_rating }}</span></div>
+              </div>
+              <div class="metric-box">
+                <div class="metric-label">Risk Level</div>
+                <div class="metric-value"><span class="risk-pill {{ p.risk_class }}">{{ p.risk_text }} ({{ p.risk_score }}/100)</span></div>
+              </div>
+              <p style="margin-top:20px;">
+    <a href="/property_ai/{{ p.id }}" style="display:inline-block;padding:12px 18px;background:#2563eb;color:white;border-radius:10px;text-decoration:none;">
+        Ask AI About This Property
+    </a>
+</p>
+              <div class="metric-box">
+                <div class="metric-label">AI Fair Value Range</div>
+                <div class="metric-value" style="font-size:18px">₹ {{ p.ai_fair_value_low }} - ₹ {{ p.ai_fair_value_high }}</div>
+              </div>
+            </div>
+            
 
-            <div class="krow">
-              <span class="deal-badge {{ p.deal_class }}">{{ p.deal_rating }}</span>
-              <span class="score">Score {{ p.investment_score }}/100</span>
+            <div class="summary">
+              <strong>Decision Summary:</strong> {{ p.decision_summary }}
             </div>
           </div>
-          <p style="color:#64748b; font-weight:700; margin-top:6px;">Fair range: ₹ {{ p.fair_low }} – ₹ {{ p.fair_high }} Lakhs</p>
+        </div>
 
-          <hr class="my-4">
+        <div class="chartcard">
+          <h3 class="section-title">Price Trend</h3>
+          <canvas id="priceChart"></canvas>
+        </div>
+      </div>
 
-          <h6 class="fw-bold mb-2">About this property</h6>
-          <p class="mb-0 muted">
-            This listing is analyzed by ValueState AI. Recommendation is generated by comparing the listed
-            price with the AI-predicted fair market value.
+      <div>
+        <div class="sidecard">
+          <h3 class="section-title">AI Insights</h3>
+          {% if p.flags %}
+            <ul class="list">
+              {% for f in p.flags %}
+                <li>{{ f }}</li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <p class="muted" style="margin:0; line-height:1.7;">No major anomaly flags were detected for this listing based on the current model rules.</p>
+          {% endif %}
+        </div>
+
+        <div class="sidecard" style="margin-top:18px;">
+          <h3 class="section-title">About this Analysis</h3>
+          <p class="muted" style="margin:0; line-height:1.8;">
+            This property is evaluated by ValueState using machine learning-based price prediction and post-prediction decision logic. The final output includes price category, investment score, deal rating, risk level, and anomaly alerts.
           </p>
-
-          <div class="section grid2">
-            <div class="box">
-              <div class="label">Price trend</div>
-              <canvas id="priceChart" height="110"></canvas>
-            </div>
-
-            <div class="box">
-              <div class="label">Update listed price (demo)</div>
-              <form method="POST" action="/property/{{ p.id }}/update_price">
-                <input class="input" type="number" name="new_price" step="0.01" placeholder="New listed price (Lakhs)" required>
-                <div style="height:10px;"></div>
-                <button class="btn-save" type="submit">Save price change</button>
-              </form>
-
-              <div style="height:10px;"></div>
-              <a class="btn-back" href="/">Back to listings</a>
-            </div>
+          <div class="cta">
+            <a class="btn btn-primary" href="/">Back to Listings</a>
+            <a class="btn btn-secondary" href="/dashboard">View Dashboard</a>
           </div>
-
-          <script>
-            const labels = {{ (labels or [])|tojson }};
-            const series = {{ (series or [])|tojson }};
-
-            const el = document.getElementById("priceChart");
-            if (el) {
-              const ctx = el.getContext("2d");
-              new Chart(ctx, {
-                type: "line",
-                data: {
-                  labels: labels,
-                  datasets: [{
-                    label: "Listed price (Lakhs)",
-                    data: series,
-                    tension: 0.25,
-                    fill: false,
-                    borderWidth: 2,
-                    pointRadius: 2
-                  }]
-                },
-                options: {
-                  responsive: true,
-                  plugins: { legend: { display: false } },
-                  scales: {
-                    x: { ticks: { maxRotation: 0, autoSkip: true } },
-                    y: { beginAtZero: false }
-                  }
-                }
-              });
-            }
-          </script>
-
         </div>
       </div>
     </div>
-
-    <div class="col-lg-4">
-      <div class="cardx p-4">
-
-        <div class="d-flex justify-content-between align-items-center mb-2">
-          <h5 class="mb-0 fw-bold">Contact / Inquiry</h5>
-        </div>
-
-        {% if success %}
-          <div class="alert alert-success fw-bold" role="alert" style="border-radius:14px;">
-            {{ success }}
-          </div>
-        {% endif %}
-
-        <form method="POST" action="/property/{{ p.id }}">
-          <div class="mb-3">
-            <label class="form-label fw-bold">Your Name</label>
-            <input class="form-control" type="text" name="name" placeholder="Enter your name" required>
-          </div>
-
-          <div class="mb-3">
-            <label class="form-label fw-bold">Phone Number</label>
-            <input class="form-control" type="tel" name="phone" placeholder="Enter phone number" required>
-          </div>
-
-          <div class="mb-3">
-            <label class="form-label fw-bold">Message</label>
-            <textarea class="form-control" name="message" rows="4" placeholder="I'm interested in this property" required></textarea>
-          </div>
-
-          <button class="btn btn-primary w-100" type="submit">Send Inquiry</button>
-        </form>
-
-        <div class="mt-3 muted" style="font-size:12px;">
-          Inquiry is stored in database (inquiries table).
-        </div>
-      </div>
-    </div>
-
   </div>
-</div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const labels = {{ (labels or [])|tojson }};
+    const series = {{ (series or [])|tojson }};
+    const el = document.getElementById('priceChart');
+    if (el) {
+      const ctx = el.getContext('2d');
+      new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Listed price (Lakhs)',
+            data: series,
+            tension: 0.25,
+            fill: false,
+            borderWidth: 2,
+            pointRadius: 3,
+            borderColor: '#2563eb',
+            pointBackgroundColor: '#1e3a8a'
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { ticks: { maxRotation: 0, autoSkip: true } },
+            y: { beginAtZero: false }
+          }
+        }
+      });
+    }
+  </script>
 </body>
 </html>

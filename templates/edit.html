@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit Property</title>
+    <style>
+        body{font-family:Arial;background:#f5f7fb}
+        .box{width:400px;margin:50px auto;background:white;padding:25px;border-radius:12px}
+        input{width:100%;padding:10px;margin:10px 0;border:1px solid #ccc;border-radius:8px}
+        button{width:100%;padding:12px;background:#2563eb;color:white;border:none;border-radius:8px}
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h2>Edit Property</h2>
+
+        <form method="POST">
+            <input name="location" value="{{ p.location }}" required>
+            <input name="sqft" value="{{ p.sqft }}" required>
+            <input name="bath" value="{{ p.bath }}" required>
+            <input name="bhk" value="{{ p.bhk }}" required>
+            <input name="listed_price" value="{{ p.listed_price }}" required>
+
+            <button type="submit">Update</button>
+        </form>
+    </div>
+</body>
+</html>
